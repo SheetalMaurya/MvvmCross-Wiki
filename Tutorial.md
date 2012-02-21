@@ -1,6 +1,8 @@
 ## Building a new MvvmCross application
 
-We start with WP7 or with MonoDroid... mainly because we find the Visual Studio tooling is the easiest to use, especially with Resharper installed.
+We start with a MonoDroid project on Windows... mainly because we find the Visual Studio tooling is the easiest to use, especially with Resharper installed.
+
+The source for the finished tutorial is in: https://github.com/slodge/MvvmCross/tree/master/Sample%20-%20Tutorial/Tutorial
 
 ## Create a new empty Solution
 
@@ -801,12 +803,15 @@ With these views coded, then there's just a little housekeeping to do:
 ```
 
 With that house-keeping done our app should now run:
+
 ![MainMenu](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/t2.png)
 
 And we should be able to see databinding of the initial values:
+
 ![MonoTouch.Dialog binding](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/t3.png)
 
 And we should be able to see databinding of dynanmic changes too:
+
 ![Changing as we type](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/t4.png)
 
 ## WP7
