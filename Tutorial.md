@@ -2,7 +2,7 @@
 
 We start with WP7 or with MonoDroid... mainly because we find the Visual Studio tooling is the easiest to use, especially with Resharper installed.
 
-### Create a new empty Solution
+## Create a new empty Solution
 
 In this case we will just call it "Tutorial"
 
@@ -10,6 +10,7 @@ In this case we will just call it "Tutorial"
 
 Add the existing projects Cirrious.Mvvm.Android and Cirrious.Mvvm.Binding.Android to your solution (later this step will be replaced with simlpy adding assembly references instead of source code inconclusion)
 
+## Android
 
 ### Build the "Core" project - the Assembly containing the ViewModels
 
@@ -136,15 +137,15 @@ namespace Tutorial.Core.Converters
 }
 ```
 
-Also, to make the converters easier to identify, add a simple static class like:
+Also, to make the converters easier to identify, add a simple class like:
 
 ```
 namespace Tutorial.Core.Converters
 {
-    public static class Converters
+    public class Converters
     {
-        public static readonly StringLengthValueConverter StringLength = new StringLengthValueConverter();
-        public static readonly StringReverseValueConverter StringReverse = new StringReverseValueConverter();
+        public readonly StringLengthValueConverter StringLength = new StringLengthValueConverter();
+        public readonly StringReverseValueConverter StringReverse = new StringReverseValueConverter();
     }
 }
 ```
@@ -240,11 +241,13 @@ namespace Tutorial.Core
 
 Add a new project to your solution - a Mono for Android application with name Tutorial.UI.Droid
 
+![Add project](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/3.png)
+
 Add references to the new project for: 
 
 - Cirrious.MvvmCross.Android
 - Cirrious.MvvmCross.Binding.Android
-- Tutorial.Core
+- Tutorial.Core.Droid
 
 Add a link to the /Resources/Values to the resource file Cirrious.MvvmCross.Binding.Android/ResourcesToCopy/MvxBindingAttribute.xml - then make sure this file type is set to AndroidResource. Doing this copies in the required identifiers into your local project resources, enabling the Android SDK to generate some unique integer identifier for them.
 
@@ -511,14 +514,295 @@ and then change Setup.cs in 2 ways:
         {
             base.FillValueConverters(registry);
 
-            var staticFiller = new MvxStaticBasedValueConverterRegistryFiller(registry);
-            staticFiller.AddStaticFieldConverters(typeof(Converters));
+            var filler = new MvxInstanceBasedValueConverterRegistryFiller(registry);
+            filler.AddFieldConverters(typeof(Converters));
         }
 ```
 
 That's it... the app should now run and you should be able to tap down into the detail view which will show you something like:
 
 ![One text property bound to 4 Views](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/6.png)
-![After some editing](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/7.png)
 
 And when you edit the text in the edit field then you should find all the other fields auto-update:
+
+![After some editing](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/7.png)
+
+
+## Touch
+
+In Android and WP7, XML-driven RelativeLayouts, LinearLayouts, StackPanels and Grids are the norm for self-adjusting UI layout. However, in iOS we are much more likely to use XIB files to achieve pixel-perfect UIs, or in MonoTouch to use MonoTouch.Dialog to try to achieve a "StackPanel-like" effect - so that's what we do in this tutorial.
+
+### Build the "Core" project - the Assembly containing the ViewModels
+
+The code for the Core is 100% identical to the code for the Android Core.
+
+To build this, create a new Touch project
+
+
+
+
+
+## WP7
+
+For most WP7 engineers this will be quite simple and straight-forward - as MVVM is a standard thing to use on WP7/Silverlight apps.
+
+### Build the "Core" project - the Assembly containing the ViewModels
+
+The code for the Core is 100% identical to the code for the Android and Touch Cores.
+
+To build this:
+
+- Add the Cirrious.MvvmCross.WindowsPhone project to your solution
+- Create a new WindowsPhone class library project.
+
+![Add solution](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/w1.png)
+
+- Delete the Class1.cs file
+- Then do some "unload-windows explorer based copy and paste-reload" magic to get the new .csproj file into the /Tutorial.Core directory and loaded into your solution
+- Then in the solution in Visual Studio, copy and paste all the files from the Core Android project into your Core WindowsPhone project
+- Then add a reference to Cirrious.MvvmCross.WindowsPhone
+- And that's it - it's the same code!
+
+### Build the "Windows Phone UI" project - the User Interface specifically for Windows Phone
+
+Add a new project to your solution - a WindowsPhone application with name Tutorial.UI.WindowsPhone
+
+![Add solution](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/w2.png)
+
+Add references to the new project for: 
+
+- Cirrious.MvvmCross.WindowsPhone
+- Tutorial.Core.WindowsPhone
+
+Now, lets create some Views...
+
+First create the Views folder.
+
+Then inside View, add a new Page called MainMenuView.xaml/MainMenuView.xaml.cs
+
+To make this View inherit from the base MvxPhonePage class and to give it access to a ViewModel, change the cs to:
+
+```
+using Cirrious.MvvmCross.WindowsPhone.Views;
+using Tutorial.Core.ViewModels;
+
+namespace Tutorial.UI.WindowsPhone.Views
+{
+    public partial class MainMenuView : BaseMainMenuView
+    {
+        public MainMenuView()
+        {
+            InitializeComponent();
+        }
+    }
+
+    public class BaseMainMenuView : MvxPhonePage<MainMenuViewModel> { }
+}
+```
+
+To then make the .xaml declarations match the .cs, modify the xaml:
+
+- so that it includes a reference to: `xmlns:Views="clr-namespace:Tutorial.UI.WindowsPhone.Views" `
+- so that the root xml object is now `<Views:BaseMainMenuView .... > ... </Views:BaseMainMenuView>`
+
+Now to add the content for this ViewModel, simply add a databound ListBox:
+
+```
+            <ListBox ItemsSource="{Binding Items}" x:Name="TheListBox">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" Margin="12" FontSize="24" TextWrapping="Wrap">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Tap">
+                                    <commandbinding:MvxEventToCommand Command="{Binding Path=DataContext.ShowItemCommand, ElementName=TheListBox}" CommandParameter="{Binding}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+```
+
+where the additional namespaces imported are:
+
+```
+    xmlns:commandbinding="clr-namespace:Cirrious.MvvmCross.WindowsPhone.Commands;assembly=Cirrious.MvvmCross.WindowsPhone"
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+```
+
+With that done, we again need to add some housekeeping:
+
+- add a Setup.cs class to create the Core.App object and to map the Views and ViewModels together.
+
+```
+using System;
+using System.Collections.Generic;
+using Cirrious.MvvmCross.Application;
+using Cirrious.MvvmCross.WindowsPhone.Platform;
+using Microsoft.Phone.Controls;
+using Tutorial.Core.ViewModels;
+using Tutorial.UI.WindowsPhone.Views;
+
+namespace Tutorial.UI.WindowsPhone
+{
+    public class Setup
+        : MvxBaseWindowsPhoneSetup
+    {
+        public Setup(PhoneApplicationFrame rootFrame)
+            : base(rootFrame)
+        {
+        }
+
+        protected override MvxApplication CreateApp()
+        {
+            var app = new Core.App();
+            return app;
+        }
+
+        protected override IDictionary<Type, Type> GetViewModelViewLookup()
+        {
+            return new Dictionary<Type, Type>()
+                       {
+                            { typeof(MainMenuViewModel), typeof(MainMenuView)},
+                       };
+        }
+    }
+}
+```
+
+- create this Setup class somewhere at the bottom of the App.xaml.cs constructor:
+
+```
+            var setup = new Setup(RootFrame);
+            setup.Initialize();
+```
+
+- again in App.xaml.cs, setup an interception handler for the very first navigation:
+
+```
+        private bool _onceOnlyNavigation = false;
+
+        // Code to execute when the application is launching (eg, from Start)
+        // This code will not execute when the application is reactivated
+        private void Application_Launching(object sender, LaunchingEventArgs e)
+        {
+            RootFrame.Navigating += (navigatingSender, navigatingArgs) =>
+                                        {
+                                            if (_onceOnlyNavigation)
+                                                return;
+
+                                            navigatingArgs.Cancel = true;
+                                            _onceOnlyNavigation = true;
+                                            var applicationStart = this.GetService<IMvxStartNavigation>();
+                                            RootFrame.Dispatcher.BeginInvoke(applicationStart.Start);
+                                        };
+        }
+```
+
+- to make this compile, you will need to add inheritance on the App.xaml class to the interface `IMvxServiceConsumer<IMvxStartNavigation>` and you will need to include some using statements:
+
+```
+using Cirrious.MvvmCross.ExtensionMethods;
+using Cirrious.MvvmCross.Interfaces.ServiceProvider;
+using Cirrious.MvvmCross.Interfaces.ViewModels;
+```
+
+That's it - your app should now build and run the 1-item list page, although obviously if you tap on the list you can't yet drill down...
+
+![Add solution](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/w3.png)
+
+Note: this list is even uglier than the Droid example - I'm sure it could be made prettier - e.g. by using more views in the DataTemplate and/or a Converter to improve the text content.
+
+So... now let's add the drill down view - the view for the SimpleTextPropertyViewModel.
+
+To do this, add a new PhonePage to the project, then edit the csharp to look like:
+
+```
+using Cirrious.MvvmCross.WindowsPhone.Views;
+using Tutorial.Core.ViewModels.Lessons;
+
+namespace Tutorial.UI.WindowsPhone.Views.Lessons
+{
+    public partial class SimpleTextPropertyView : BaseSimpleTextPropertyView
+    {
+        public SimpleTextPropertyView()
+        {
+            InitializeComponent();
+        }
+    }
+
+    public class BaseSimpleTextPropertyView : MvxPhonePage<SimpleTextPropertyViewModel> { }
+}
+```
+
+and change the xaml root element to the appropriate base type `<Lessons:BaseSimpleTextPropertyView`
+
+Now, add some xaml content to support the ViewModel binding:
+
+```
+            <StackPanel>
+                <TextBlock
+                    Text="Current text"
+                    Style="{StaticResource PhoneTextSubtleStyle}"
+                    />
+                <TextBlock 
+                    Text="{Binding TheText}" 
+                    />
+
+                <TextBlock
+                    Text="Length"
+                    Style="{StaticResource PhoneTextSubtleStyle}"
+                    />
+                <TextBlock 
+                    Text="{Binding TheText, Converter={StaticResource StringLengthValueConverter}}" 
+                    />
+                
+                <TextBlock
+                    Text="In Reverse"
+                    Style="{StaticResource PhoneTextSubtleStyle}"
+                    />
+                <TextBlock 
+                    Text="{Binding TheText, Converter={StaticResource StringReverseValueConverter}}" 
+                    />
+
+                <TextBlock
+                    Text="Editable:"
+                    Style="{StaticResource PhoneTextSubtleStyle}"
+                    />
+                <TextBox
+                    Text="{Binding TheText, Mode=TwoWay}" 
+                    />
+            </StackPanel>
+```
+
+Now, just the house keeping to go:
+
+- add the Converters as a resource to the App.xaml:
+```
+    <Application.Resources>
+        <Converters:StringReverseValueConverter x:Key="StringReverseValueConverter"/>
+        <Converters:StringLengthValueConverter x:Key="StringLengthValueConverter"/>
+    </Application.Resources>
+```
+
+where the namespace import is: `xmlns:Converters="clr-namespace:Tutorial.Core.Converters;assembly=Tutorial.Core.WindowsPhone"`
+
+- and update the ViewModel-View map in Setup.cs:
+```
+         protected override IDictionary<Type, Type> GetViewModelViewLookup()
+        {
+            return new Dictionary<Type, Type>()
+                       {
+                            { typeof(MainMenuViewModel), typeof(MainMenuView)},
+                            { typeof(SimpleTextPropertyViewModel), typeof(SimpleTextPropertyView)},
+                       };
+        }
+```
+
+That's it - the app should now run...
+
+![Add solution](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/w4.png)
+
+And the ViewModel text is now editable (although the way the WP7 TextBox works uses focus as the Change trigger)
+
+![Add solution](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/w5.png)
