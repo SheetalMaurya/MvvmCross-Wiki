@@ -6,12 +6,16 @@ We start with WP7 or with MonoDroid... mainly because we find the Visual Studio 
 
 In this case we will just call it "Tutorial"
 
+![Add solution](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/1.png)
+
 Add the existing projects Cirrious.Mvvm.Android and Cirrious.Mvvm.Binding.Android to your solution (later this step will be replaced with simlpy adding assembly references instead of source code inconclusion)
 
 
 ### Build the "Core" project - the Assembly containing the ViewModels
 
 Start a new MonoDroid Class Library project - in this case we create it with name Tutorial.Core, and then rename it afterwards to Tutorial.Core.Droid
+
+![Create Droid Library project](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/2.png)
 
 Add a reference for Cirrious.Mvvm.Android to this new class library.
 
@@ -401,6 +405,9 @@ where SplashScreen.axml looks like:
 
 At this point you can run the app and see a single item list... not very exciting, and when you click on the list item, you'll generate a KeyNotFoundException, because we have no View registered for our SimpleTextPropertyViewModel
 
+![SplashScreen...](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/4.png)
+![A list with one item](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/5.png)
+
 So... let's add a view - starting with the XML:
 
 ```
@@ -462,6 +469,7 @@ So... let's add a view - starting with the XML:
 Note that this XML contains lots of views, that many of them are bound to TheText as we've seen before, except that now we are also sometimes using our ValueConverters to change what is displayed.
 
 To enable this XML to be loaded, add an Activity for our View:
+
 ```
 using Android.App;
 using Cirrious.MvvmCross.Binding.Android.Views;
@@ -510,5 +518,7 @@ and then change Setup.cs in 2 ways:
 
 That's it... the app should now run and you should be able to tap down into the detail view which will show you something like:
 
+![One text property bound to 4 Views](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/6.png)
+![After some editing](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/7.png)
 
 And when you edit the text in the edit field then you should find all the other fields auto-update:
