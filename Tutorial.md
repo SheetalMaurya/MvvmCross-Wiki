@@ -528,19 +528,286 @@ And when you edit the text in the edit field then you should find all the other 
 ![After some editing](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/7.png)
 
 
+
 ## Touch
 
-In Android and WP7, XML-driven RelativeLayouts, LinearLayouts, StackPanels and Grids are the norm for self-adjusting UI layout. However, in iOS we are much more likely to use XIB files to achieve pixel-perfect UIs, or in MonoTouch to use MonoTouch.Dialog to try to achieve a "StackPanel-like" effect - so that's what we do in this tutorial.
+In Android and WP7, XML-driven RelativeLayouts, LinearLayouts, StackPanels and Grids are the norm for self-adjusting UI layout. However, in iOS we are encouraged more to use XIB files to achieve pixel-perfect UIs and the XIB files aren't (in my opinion) quite as programmer friendly.
+
+This does mean that the C# code for the Touch tutorial is a bit more verbose and technical than the Android and WP7 samples, but the underlying View and Databinding principles still apply.
+
+On of the techniques used in this tutorial, and indeed in many of the MvvmCross samples, is to use a branch of MonoTouch.Dialog to achieve a "StackPanel-like" effect. I personally find MonoTouch.Dialog much easier to use than coding with XIB files or coding directly to raw UIViews or UITableViews. When, however, I do want or need to use other UI approaches for a project, then MvvmCross still supports them, as Mvx navigation works at the UIViewController level and as Mvx binding can work on any target which supports public Properties and public events.
 
 ### Build the "Core" project - the Assembly containing the ViewModels
 
-The code for the Core is 100% identical to the code for the Android Core.
+The code for the Core in Touch is 100% identical to the code for the Android Core.
 
-To build this, create a new Touch project
+To build this
 
+- Add the Cirrious.MvvmCross.Touch, Cirrious.MvvmCross.Binding.Touch, Cirrious.MvvmCross.Dialog.Touch and our special MonoTouch.Dialog projects to your solution
+- Create a new MonoTouch class library project.
+- Delete the Class1.cs file
+- Then do some "unload-finder or windows explorer based copy and paste-reload" magic to get the new .csproj file into the /Tutorial.Core directory and loaded into your solution
+- Then in the solution in MonoDevelop or Visual Studio, copy and paste all the files from the Core Android project into your Core Touch project
+- Then add a reference to Cirrious.MvvmCross.Touch
+- And that's it - it's the same code!
 
+### Build the "MonoTouch UI" project - the User Interface specifically for iOS/MonoTouch
 
+Add a new project to your solution - an iPhone single view application with name Tutorial.UI.Touch
 
+![Add project](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/t1.png)
+
+Add references to the new project for: 
+
+- Cirrious.MvvmCross.Touch
+- Cirrious.MvvmCross.Binding.Touch
+- Cirrious.MvvmCross.Dialog.Touch
+- MonoTouch.Dialog (our local version)
+- Tutorial.Core.Touch
+
+Then delete the default generated ViewController and its XIB
+
+Now, lets create some Views...
+
+First create the Views folder.
+
+Then create a class MainMenuView.cs. This class needs to inherit from a table view controller and needs to have access to a MainMenuViewModel - so the base class is MvxTouchTableViewController<MainMenuViewModel>.
+
+We then also need to add some basic binding support to the class:
+
+```
+	public class MainMenuView
+		: MvxTouchTableViewController<MainMenuViewModel>
+		, IMvxServiceConsumer<IMvxBinder>
+	{
+		private readonly List<IMvxUpdateableBinding> _bindings;
+
+        public MainMenuView(MvxShowViewModelRequest request)
+            : base(request)
+		{
+			_bindings = new List<IMvxUpdateableBinding>();
+		}
+		
+		protected override void Dispose (bool disposing)
+		{
+			if (disposing)
+			{
+                _bindings.ForEach(x => x.Dispose());
+			}
+			
+			base.Dispose(disposing);
+		}
+```
+
+Beyond this, the binding itself happens in ViewDidLoad() - in this class we setup binding for both a Table Delegate and a Table Source:
+
+```
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            Title = "Views";
+
+            var tableDelegate = new MvxBindableTableViewDelegate();
+            tableDelegate.SelectionChanged += (sender, args) => ViewModel.ShowItemCommand.Execute(args.AddedItems[0]);
+            var tableSource = new TableViewDataSource(TableView);
+
+            var binder = this.GetService<IMvxBinder>();
+            _bindings.AddRange(binder.Bind(ViewModel, tableDelegate, "{'ItemsSource':{'Path':'Items'}}"));
+            _bindings.AddRange(binder.Bind(ViewModel, tableSource, "{'ItemsSource':{'Path':'Items'}}"));
+
+            TableView.Delegate = tableDelegate;
+            TableView.DataSource = tableSource;
+            TableView.ReloadData();
+        }
+```
+
+Finally, the actual TableSource we use in this class, along with the UITableCellView for this table - are setup as nested classes:
+
+- The Source:
+```
+        public class TableViewDataSource : MvxBindableTableViewDataSource
+        {
+            static readonly NSString CellIdentifier = new NSString("TableViewCell");
+
+            public TableViewDataSource(UITableView tableView)
+                : base(tableView)
+            {
+            }
+
+            protected override UITableViewCell GetOrCreateCellFor(UITableView tableView, NSIndexPath indexPath, object item)
+            {
+                var reuse = tableView.DequeueReusableCell(CellIdentifier);
+                if (reuse != null)
+                    return reuse;
+
+                var toReturn = new TableViewCell(UITableViewCellStyle.Subtitle, CellIdentifier)
+                                   {Accessory = UITableViewCellAccessory.DisclosureIndicator};
+                return toReturn;
+            }
+        }
+```
+
+The cell:
+
+```
+        public class TableViewCell
+            : MvxBindableTableViewCell
+        {
+            public static readonly MvxBindingDescription[] BindingDescriptions
+                = new[]
+                  {
+                      new MvxBindingDescription()
+                          {
+                              TargetName = "TitleText",
+                              SourcePropertyPath = "Name"
+                          },
+                      new MvxBindingDescription()
+                          {
+                              TargetName = "DetailText",
+                              SourcePropertyPath = "FullName"
+                          },
+                  };
+
+            // if you don't want to code the MvxBindingDescription, then a string could instead be used:
+            //public const string BindingText = @"{'TitleText':{'Path':'Name'},'DetailText':{'Path':'FullName'}}";
+
+            public TableViewCell(UITableViewCellStyle cellStyle, NSString cellIdentifier)
+                : base(BindingDescriptions, cellStyle, cellIdentifier)
+            {
+            }
+        }
+```
+
+For the second View, the SimpleTextPropertyView we use MonoTouch.Dialog as the base class. This makes the code much, much more straightforward than for the previous MainMenuView:
+
+```
+    public class SimpleTextPropertyView
+         : MvxTouchDialogViewController<SimpleTextPropertyViewModel>
+    {
+        public SimpleTextPropertyView(MvxShowViewModelRequest request) 
+            : base(request, UITableViewStyle.Grouped, null, true)
+        {
+        }
+
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();
+
+            this.NavigationItem.SetLeftBarButtonItem(new UIBarButtonItem("Cancel", UIBarButtonItemStyle.Bordered, null), false);
+            this.NavigationItem.LeftBarButtonItem.Clicked += delegate
+            {
+                ViewModel.BackCommand.Execute();
+            };
+
+            this.Root = new RootElement("Simple Text Property")
+                            {
+                                new Section("Display")
+                                    {
+                                        new StringElement("Current").Bind(this, "{'Value':{'Path':'TheText'}}"),
+                                        new StringElement("Length").Bind(this, "{'Value':{'Path':'TheText','Converter':'StringLength'}}"),
+                                        new StringElement("Reversed").Bind(this, "{'Value':{'Path':'TheText','Converter':'StringReverse'}}"),
+                                    },
+                                new Section("Editing")
+                                    {
+                                        new EntryElement("Edit").Bind(this, "{'Value':{'Path':'TheText'}}"),
+                                    },
+                            };
+        }
+    }
+```
+
+Note that for our iOS View, we have to manually add a Cancel/Back button - this is because iOS does not provide a physical Back Button at the hardware level.
+
+With these views coded, then there's just a little housekeeping to do:
+
+1. Create a Setup class: to create the App object; to provide the View-ViewModel mapping; and to register our converters.
+
+```
+    public class Setup
+        : MvxTouchDialogBindingSetup
+    {
+        public Setup(MvxApplicationDelegate applicationDelegate, IMvxTouchViewPresenter presenter)
+            : base(applicationDelegate, presenter)
+        {
+        }
+
+        #region Overrides of MvxBaseSetup
+
+        protected override MvxApplication CreateApp()
+        {
+            var app = new App();
+            return app;
+        }
+
+        protected override IDictionary<Type, Type> GetViewModelViewLookup()
+        {
+            return new Dictionary<Type, Type>()
+                       {
+                            { typeof(MainMenuViewModel), typeof(MainMenuView)},
+                            { typeof(SimpleTextPropertyViewModel), typeof(SimpleTextPropertyView)},
+                       };
+        }
+		
+		protected override void FillValueConverters(Cirrious.MvvmCross.Binding.Interfaces.Binders.IMvxValueConverterRegistry registry)
+        {
+            base.FillValueConverters(registry);
+
+            var filler = new MvxInstanceBasedValueConverterRegistryFiller(registry);
+            filler.AddFieldConverters(typeof(Converters));
+        }
+
+        #endregion
+    }
+```
+
+2. Change the appdelegate class so that it creates and starts our setup.cs process
+
+```
+    // The UIApplicationDelegate for the application. This class is responsible for launching the 
+    // User Interface of the application, as well as listening (and optionally responding) to 
+    // application events from iOS.
+    [Register("AppDelegate")]
+    public partial class AppDelegate
+        : MvxApplicationDelegate
+        , IMvxServiceConsumer<IMvxStartNavigation>
+    {
+        // class-level declarations
+        UIWindow window;
+
+        //
+        // This method is invoked when the application has loaded and is ready to run. In this 
+        // method you should instantiate the window, load the UI into it and then make the window
+        // visible.
+        //
+        // You have 17 seconds to return from this method, or iOS will terminate your application.
+        //
+        public override bool FinishedLaunching(UIApplication app, NSDictionary options)
+        {
+            window = new UIWindow(UIScreen.MainScreen.Bounds);
+
+            // initialize app for single screen iPhone display
+            var presenter = new MvxTouchSingleViewsPresenter(this, window);
+            var setup = new Setup(this, presenter);
+            setup.Initialize();
+
+            // start the app
+            var start = this.GetService<IMvxStartNavigation>();
+            start.Start();
+
+            return true;
+        }
+    }
+```
+
+With that house-keeping done our app should now run:
+![MainMenu](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/t2.png)
+
+And we should be able to see databinding of the initial values:
+![MonoTouch.Dialog binding](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/t3.png)
+
+And we should be able to see databinding of dynanmic changes too:
+![Changing as we type](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/t4.png)
 
 ## WP7
 
@@ -555,7 +822,7 @@ To build this:
 - Add the Cirrious.MvvmCross.WindowsPhone project to your solution
 - Create a new WindowsPhone class library project.
 
-![Add solution](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/w1.png)
+![Add project](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/w1.png)
 
 - Delete the Class1.cs file
 - Then do some "unload-windows explorer based copy and paste-reload" magic to get the new .csproj file into the /Tutorial.Core directory and loaded into your solution
