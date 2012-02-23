@@ -2,6 +2,8 @@ I've added a second "Lesson" to the Tutorial app, and also done a little refacto
 
 This new "Lesson" is called PullToRefresh, and demonstrates a view on each platform where the user can "Pull down" the list to get more data.
 
+![PullToRefresh](https://github.com/slodge/MvvmCross/blob/master/Sample%20-%20Tutorial/Help/PullToRefresh.png)
+
 ## PullToRefreshViewModel
 
 The ViewModel in this example is https://github.com/slodge/MvvmCross/blob/master/Sample%20-%20Tutorial/Tutorial/Tutorial.Core/ViewModels/Lessons/PullToRefreshViewModel.cs
