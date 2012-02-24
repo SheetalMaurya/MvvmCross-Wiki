@@ -170,25 +170,22 @@ For the View, we use a XIB file (from the interface designer) to generate most o
             base.ViewDidLoad ();
             
             var foldingTvc = new FoldingTableViewController(TableViewHolder.Frame, UITableViewStyle.Grouped);
-            
-            // Perform any additional setup after loading the view, typically from a nib.
-            var tableDelegate = new MvxBindableTableViewDelegate();
+
             var tableSource = new TableViewDataSource(foldingTvc.TableView);
 
             this.AddBindings(
                 new Dictionary<object, string>()
                     {
-                        { tableDelegate, "{'ItemsSource':{'Path':'Emails'}}" },
                         { tableSource, "{'ItemsSource':{'Path':'Emails'}}" },
                         { foldingTvc, "{'RefreshHeadCommand':{'Path':'RefreshHeadCommand'},'Refreshing':{'Path':'IsRefreshingHead'}}" },
                         { NumberOfEmailsLabel, "{'Text':{'Path':'Emails.Count'}}" }
                     });
-                
             
-            foldingTvc.TableView.Delegate = tableDelegate;
-            foldingTvc.TableView.DataSource = tableSource;
+            foldingTvc.TableView.Source = tableSource;
             foldingTvc.TableView.ReloadData();
             
             Add(foldingTvc.View);			
         }
 ```
+
+Note: the iPhone sample now uses a custom cell - driven by a Nib file. The loading of that cell is a bit complicated - but that's all abstracted away inside the cell class, and it's complicated because of Obj-C, Cocoa, and MonoTouch, not because of Mvvm - so I won't cover that more here (for more info, see www.alexyork.net/blog/2011/07/18/creating-custom-uitableviewcells-with-monotouch-the-correct-way/ - including the comments which cover some xcode 4 updates).
