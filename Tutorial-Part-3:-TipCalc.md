@@ -57,7 +57,7 @@ And the views for each platform were then very simple to code:
 
 ###iOS:
 
-UI designed in XIB with binding done as:
+UI designed in the XIB designer, with binding then added in ViewDidLoad using Json text:
 ```
         public override void ViewDidLoad ()
         {
@@ -77,7 +77,7 @@ UI designed in XIB with binding done as:
 
 ###Android:
 
-UI and binding done in AXML:
+UI and binding are all included in the AXML Layout files using the same JSON binding text as for iOS:
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
@@ -181,7 +181,7 @@ So the Activity C# is just:
 
 ###WP7:
 
-All the UI and binding in XAML:
+All the UI and binding is done in the WP7 XAML files, with the binding achieved using normal XAML markup:
 
 ```
             <StackPanel>
