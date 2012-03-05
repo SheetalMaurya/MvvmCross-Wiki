@@ -230,8 +230,6 @@ namespace Tutorial.Core
     {
         public App()
         {
-            Title = "MvvmCross Tutorial";
-
             var startApplicationObject = new StartApplicationObject();
             this.RegisterServiceInstance<IMvxStartNavigation>(startApplicationObject);
         }
@@ -343,24 +341,6 @@ namespace Tutorial.UI.Droid
         {
             return new App();
         }
-
-        protected override IDictionary<Type, Type> GetViewModelViewLookup()
-        {
-            return new Dictionary<Type, Type>()
-                       {
-                           {typeof(MainMenuViewModel),typeof(MainMenuView)}
-                       };
-        }
-
-        public override string ExecutableNamespace
-        {
-            get { return "Tutorial.UI.Droid"; }
-        }
-
-        public override Assembly ExecutableAssembly
-        {
-            get { return GetType().Assembly; }
-        }
     }
 }
 ```
@@ -386,11 +366,6 @@ namespace Tutorial.UI.Droid
         protected override MvxBaseAndroidSetup CreateSetup()
         {
             return new Setup(ApplicationContext);
-        }
-
-        protected override void OnCreate(Bundle bundle)
-        {
-            base.OnCreate(bundle);
         }
     }
 }
@@ -494,30 +469,14 @@ namespace Tutorial.UI.Droid.Views.Lessons
 }
 ```
 
-and then change Setup.cs in 2 ways:
+and then change Setup.cs tp:
 
-- first add our View/ViewModel pair to the lookup list:
+- override the FillValueConverters method in order to register our Value Converters with the Mvx framework:
 
 ```
-        protected override IDictionary<Type, Type> GetViewModelViewLookup()
+        protected override IEnumerable<Type> ValueConverterHolders
         {
-            return new Dictionary<Type, Type>()
-                       {
-                           {typeof(MainMenuViewModel),typeof(MainMenuView)},
-                           {typeof(SimpleTextPropertyViewModel),typeof(SimpleTextPropertyView)}
-                       };
-        }
-```
-
-- second override the FillValueConverters method in order to register our Value Converters with the Mvx framework:
-
-```
-        protected override void FillValueConverters(Cirrious.MvvmCross.Binding.Interfaces.Binders.IMvxValueConverterRegistry registry)
-        {
-            base.FillValueConverters(registry);
-
-            var filler = new MvxInstanceBasedValueConverterRegistryFiller(registry);
-            filler.AddFieldConverters(typeof(Converters));
+            get { return new[] {typeof (Converters)}; }
         }
 ```
 
@@ -734,32 +693,16 @@ With these views coded, then there's just a little housekeeping to do:
         {
         }
 
-        #region Overrides of MvxBaseSetup
-
         protected override MvxApplication CreateApp()
         {
             var app = new App();
             return app;
         }
-
-        protected override IDictionary<Type, Type> GetViewModelViewLookup()
-        {
-            return new Dictionary<Type, Type>()
-                       {
-                            { typeof(MainMenuViewModel), typeof(MainMenuView)},
-                            { typeof(SimpleTextPropertyViewModel), typeof(SimpleTextPropertyView)},
-                       };
-        }
 		
-		protected override void FillValueConverters(Cirrious.MvvmCross.Binding.Interfaces.Binders.IMvxValueConverterRegistry registry)
+        protected override IEnumerable<Type> ValueConverterHolders
         {
-            base.FillValueConverters(registry);
-
-            var filler = new MvxInstanceBasedValueConverterRegistryFiller(registry);
-            filler.AddFieldConverters(typeof(Converters));
+            get { return new[] { typeof(Converters) }; }
         }
-
-        #endregion
     }
 ```
 
@@ -930,14 +873,6 @@ namespace Tutorial.UI.WindowsPhone
             var app = new Core.App();
             return app;
         }
-
-        protected override IDictionary<Type, Type> GetViewModelViewLookup()
-        {
-            return new Dictionary<Type, Type>()
-                       {
-                            { typeof(MainMenuViewModel), typeof(MainMenuView)},
-                       };
-        }
     }
 }
 ```
@@ -1058,18 +993,6 @@ Now, just the house keeping to go:
 ```
 
 where the namespace import is: `xmlns:Converters="clr-namespace:Tutorial.Core.Converters;assembly=Tutorial.Core.WindowsPhone"`
-
-- and update the ViewModel-View map in Setup.cs:
-```
-         protected override IDictionary<Type, Type> GetViewModelViewLookup()
-        {
-            return new Dictionary<Type, Type>()
-                       {
-                            { typeof(MainMenuViewModel), typeof(MainMenuView)},
-                            { typeof(SimpleTextPropertyViewModel), typeof(SimpleTextPropertyView)},
-                       };
-        }
-```
 
 That's it - the app should now run...
 
