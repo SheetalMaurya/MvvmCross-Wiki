@@ -494,9 +494,7 @@ And when you edit the text in the edit field then you should find all the other 
 
 In Android and WP7, XML-driven RelativeLayouts, LinearLayouts, StackPanels and Grids are the norm for self-adjusting UI layout. However, in iOS we are encouraged more to use XIB files to achieve pixel-perfect UIs and the XIB files aren't (in my opinion) quite as programmer friendly.
 
-This does mean that the C# code for the Touch tutorial is a bit more verbose and technical than the Android and WP7 samples, but the underlying View and Databinding principles still apply.
-
-On of the techniques used in this tutorial, and indeed in many of the MvvmCross samples, is to use a branch of MonoTouch.Dialog to achieve a "StackPanel-like" effect. I personally find MonoTouch.Dialog much easier to use than coding with XIB files or coding directly to raw UIViews or UITableViews. When, however, I do want or need to use other UI approaches for a project, then MvvmCross still supports them, as Mvx navigation works at the UIViewController level and as Mvx binding can work on any target which supports public Properties and public events.
+The technique used in this tutorial is to use a branch of MonoTouch.Dialog to achieve a "StackPanel-like" effect. If you prefer, however, to create you UI using code or using a XIB file, then check out some of the other tutorials - MvvmCross supports these as the binding can work on any target which supports public Properties and public events.
 
 ### Build the "Core" project - the Assembly containing the ViewModels
 
@@ -522,8 +520,7 @@ Add references to the new project for:
 
 - Cirrious.MvvmCross.Touch
 - Cirrious.MvvmCross.Binding.Touch
-- Cirrious.MvvmCross.Dialog.Touch
-- MonoTouch.Dialog (our local version)
+- Cirrious.MvvmCross.Dialog.Touch (which includes a modified version of MonoTouch.Dialog)
 - Tutorial.Core.Touch
 
 Then delete the default generated ViewController and its XIB
