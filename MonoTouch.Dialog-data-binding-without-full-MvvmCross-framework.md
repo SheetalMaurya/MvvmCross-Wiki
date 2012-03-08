@@ -5,7 +5,7 @@ This demo is based on TipCalc and is at:
 https://github.com/slodge/MvvmCross/tree/master/Sample%20-%20SimpleDialogBinding/SimpleBinding
 
 ##Setup
-It uses a simplified MvvmCross setup in the AppDelegate class - this setup only passes in information about which `IValueConverter`s should be registered for data-binding:
+It uses a simplified MvvmCross setup in the AppDelegate class - this setup only passes in information about which `IValueConverter` classes should be registered for data-binding:
 
 ```
 MvxSimpleTouchDialogBindingSetup.Initialise(typeof(Converters.Converters));
@@ -74,6 +74,8 @@ In this particular sample, the ViewModel used is a very straight-forward `INotif
         }
     }
 ```
+
+**Note**: when authoring your own ViewModels, please be very careful to make sure that the PropertyChanged event is only ever fired on the UI thread. In the full mvvmcross framework, there's a base class to help you do this - [MvxNotifyPropertyChanged.cs](https://github.com/slodge/MvvmCross/blob/master/Cirrious/Cirrious.MvvmCross/ViewModels/MvxNotifyPropertyChanged.cs)
 
 ##View
 And finally the view is then just setup as a "normal MonoTouch.Dialog" but with extra `Bind` statements added:
