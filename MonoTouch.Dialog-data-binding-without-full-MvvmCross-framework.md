@@ -115,7 +115,7 @@ And finally the view is then just setup as a "normal MonoTouch.Dialog" but with 
 ```
 
 ##Summary
-This code as presented should be very simple to follow.
+This code as presented should be very simple to follow, and should give you a minimal setup experience before you can start databinding your own views and models.
 
 Under the hood, it is a little bit inefficient - behind the scenes there is still quite a lot of Mvx code being loaded which is never actually used. 
 
