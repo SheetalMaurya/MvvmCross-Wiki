@@ -1,20 +1,20 @@
 I volunteered to put a demo together of how to use the MvvmCross databinding code without using the full Mvvm structure for your app.
 
-This demo is at:
+This demo is based on TipCalc and is at:
 
 https://github.com/slodge/MvvmCross/tree/master/Sample%20-%20SimpleDialogBinding/SimpleBinding
 
-The demo is based on TipCalc.
-
-It uses a simplified MvvmCross setup in the AppDelegate class - this setup only passes in the IValueConverters to use in binding:
+##Setup
+It uses a simplified MvvmCross setup in the AppDelegate class - this setup only passes in information about which `IValueConverter`s should be registered for data-binding:
 
 ```
 MvxSimpleTouchDialogBindingSetup.Initialise(typeof(Converters.Converters));
 ```
 
-Because of this simplified setup, ViewModel and View creation is now left entirely up to the coder - MvvmCross just keeps entirely out of the way!
+Because of this simplified setup, ViewModel and View creation is now left entirely up to the coder - MvvmCross keeps entirely out of the way.
 
-The ViewModel then used in this example is a very straight-forward `INotifyPropertyChanged` class - no `Mvx` in sight!
+##ViewModel
+In this particular sample, the ViewModel used is a very straight-forward `INotifyPropertyChanged` class - no `Mvx` in sight!
 
 ```
     public class TipViewModel
@@ -75,6 +75,7 @@ The ViewModel then used in this example is a very straight-forward `INotifyPrope
     }
 ```
 
+##View
 And finally the view is then just setup as a "normal MonoTouch.Dialog" but with extra `Bind` statements added:
 
 ```
@@ -113,4 +114,10 @@ And finally the view is then just setup as a "normal MonoTouch.Dialog" but with 
     }
 ```
 
-This code as presented is a little bit inefficient - behind the scenes there is still quite a lot of Mvx code being loaded. However, for a simple binding solution if you are only working on MonoTouch, then I think it works quite well. For coders who are looking beyond MonoTouch, then I definitely recommend still trying the "full" MvvmCross experience - it's built from the ground up to allow you to share 90% of your code across platforms.
+##Summary
+This code as presented should be very simple to follow.
+
+Under the hood, it is a little bit inefficient - behind the scenes there is still quite a lot of Mvx code being loaded which is never actually used. 
+
+
+For a simple binding solution if you are only working on MonoTouch, then I think this works very well. For coders who are looking beyond MonoTouch, then I definitely recommend still trying the "full" MvvmCross experience - it's built from the ground up to allow you to share 90% of your code across platforms.
