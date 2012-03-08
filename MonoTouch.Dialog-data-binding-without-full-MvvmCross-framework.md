@@ -6,11 +6,13 @@ https://github.com/slodge/MvvmCross/tree/master/Sample%20-%20SimpleDialogBinding
 
 The demo is based on TipCalc.
 
-It uses a simplified MvvmCross setup in the AppDelegate class - this setup only passes in the converters to use - app navigation is purely up to the user:
+It uses a simplified MvvmCross setup in the AppDelegate class - this setup only passes in the IValueConverters to use in binding:
 
 ```
 MvxSimpleTouchDialogBindingSetup.Initialise(typeof(Converters.Converters));
 ```
+
+Because of this simplified setup, ViewModel and View creation is now left entirely up to the coder - MvvmCross just keeps entirely out of the way!
 
 The ViewModel then used in this example is a very straight-forward `INotifyPropertyChanged` class - no `Mvx` in sight!
 
