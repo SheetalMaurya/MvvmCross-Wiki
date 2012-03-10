@@ -10,8 +10,8 @@ What I recommend for most general situations is:
 - that parent page owns several child ViewModels -exposed as public properties - 1 for each "tab".
 - in the individual platforms:
  - in Android you can either:
-  - use the SetContent(viewId) method to setup each tab using normal databinding
-  - or you can separate out each tab into its own Mvx-Activity
+     - use the SetContent(viewId) method to setup each tab using normal databinding
+      - or you can separate out each tab into its own Mvx-Activity
  - in iOS, you can use normal UITabBarController along with TabBarItems on each tab
  - in WP7 you can use normal data-binding to setup each pivotitem or panoramaitem
 
