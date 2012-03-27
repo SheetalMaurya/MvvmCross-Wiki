@@ -2,7 +2,11 @@ Welcome to the MvvmCross wiki!
 
 ## MvvmCross
 
-You are probably looking for the Tutorial 
+Here are some of the latest examples:
+- https://github.com/slodge/MvvmCross/wiki/New-Samples--TwitterSearch-and-Conference
+![sql bits](http://i.imgur.com/vfWen.png)
+
+Maybe you are looking for the Tutorial:
 
 - https://github.com/slodge/MvvmCross/wiki/Tutorial-Part-1
 - https://github.com/slodge/MvvmCross/wiki/Tutorial-Part-2:--PullToRefresh
