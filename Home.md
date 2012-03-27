@@ -3,7 +3,9 @@ Welcome to the MvvmCross wiki!
 ## MvvmCross
 
 Here are some of the latest examples:
+
 - https://github.com/slodge/MvvmCross/wiki/New-Samples--TwitterSearch-and-Conference
+
 ![sql bits](http://i.imgur.com/vfWen.png)
 
 Maybe you are looking for the Tutorial:
