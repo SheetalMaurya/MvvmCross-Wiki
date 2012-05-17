@@ -125,7 +125,7 @@ With that control in place, everything now is done by binding - especially in th
 although there is also a little binding in the the list layout too - in https://github.com/slodge/MvvmCross/blob/master/Sample%20-%20Tutorial/Tutorial/Tutorial.UI.Droid/Resources/Layout/pull_to_refresh_bindable_list.axml :
 
 ```
-    <cirrious.mvvmcross.binding.android.views.MvxBindableListView
+    <Mvx.MvxBindableListView
         android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
