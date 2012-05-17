@@ -274,7 +274,7 @@ Within this, notice that this is fairly normal Android XML - except that we have
 With that item template done, now add Page_MainMenuView.axml - which will show our main menu... In the XML for this, type:
 ```
 <?xml version="1.0" encoding="utf-8"?>
-<cirrious.mvvmcross.binding.android.views.MvxBindableListView
+<Mvx.MvxBindableListView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res/Tutorial.UI.Droid"
     android:layout_width="fill_parent"
