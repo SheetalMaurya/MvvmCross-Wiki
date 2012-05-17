@@ -16,23 +16,13 @@ In order to let the Android resource builder know about our databinding attribut
 
 Just as with the Touch example, we  need a small stub of setup code in order to initialise the databinding system - especially the IoC framework.
 
-This code is a singleton in Setup.cs and we check it from every Activity::OnCreate() call.
+This code is a singleton in Setup.cs and it's check from every Activity::OnCreate() call.
 
 ```
     public class Setup 
         : MvxSimpleAndroidBindingSetup
     {
-        private static Setup _singleton;
-
-        public static void EnsureInitialised(Context applicationContext)
-        {
-            if (_singleton != null)
-                return;
-            _singleton = new Setup(applicationContext);
-            _singleton.Initialize();
-        }
-
-        private Setup(Context applicationContext)
+        public Setup(Context applicationContext)
             : base(applicationContext, typeof(Converters.Converters))
         {
         }
@@ -125,8 +115,6 @@ The C# for our Activity is very simple - the Activity just has responsibility fo
 
         protected override void OnCreate(Bundle bundle)
         {
-            Setup.EnsureInitialised(ApplicationContext);
-
             base.OnCreate(bundle);
 
             // Set our view from the "main" layout resource
