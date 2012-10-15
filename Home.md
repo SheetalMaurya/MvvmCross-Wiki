@@ -1,5 +1,11 @@
 Welcome to the MvvmCross wiki!
 
+## MvvmCross vNext
+
+Sorry... this Wiki is currently out of date... updating it for vNext is on my TODO list...
+
+If you would like to help, then please get in touch :)
+
 ## MvvmCross
 
 Here are some of the latest examples:
