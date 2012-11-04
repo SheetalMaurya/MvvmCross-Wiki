@@ -70,8 +70,6 @@ Hunting for memory leaks - http://stackoverflow.com/questions/12494804/helping-t
 
 One pattern for error reporting - http://stackoverflow.com/questions/10411352/what-is-the-suggested-way-to-handle-exceptions-during-in-a-mvvmcross-application and also at http://stackoverflow.com/questions/11053535/alerts-or-popups-in-mvvmcross
 
-Changes to IoC in vNext - http://slodge.blogspot.co.uk/2012/10/changes-to-ioc-in-vnext.html
-
 ###Testing
 
 Testing ViewModels - http://slodge.blogspot.co.uk/2012/10/testing-viewmodels-in-mvvmcross.html
@@ -167,13 +165,15 @@ Why no speed and bearing :( - http://stackoverflow.com/questions/11582345/why-is
 
 Integrating VideoView from Xamarin.Mobile - http://stackoverflow.com/questions/13016103/mvvmcross-vnext-monodroid-use-a-videoview-inside-a-plugin
 
-###Plugins
+###Plugins/IoC
 
 How to write a Conventional plugin - http://stackoverflow.com/questions/12842727/mvvmcross-conventional-plugin-bypass
 
 How to inject platform specific services - http://stackoverflow.com/questions/12564272/making-mono-cross-platform-support-for-task-intent
 
 Another introduction to Conventional plugins - http://stackoverflow.com/questions/12931618/mvvmcross-vnext-merge-plugins-with-monodroid
+
+Changes to IoC in vNext - http://slodge.blogspot.co.uk/2012/10/changes-to-ioc-in-vnext.html
 
 ###"Simple Projects"
 
