@@ -32,7 +32,23 @@ Or maybe you just want Android data binding?
 
 ## Some useful links...
 
-Key posts from http://slodge.blogspot.com and key http://stackoverflow.com/questions/tagged/mvvmcross questions and answers
+For setting up your development environment to support portable libraries, see the steps in http://slodge.blogspot.co.uk/2012/09/mvvmcross-vnext-portable-class.html
+
+http://vimeo.com/39019207 provides a video of me talking about this project (with poor noise quality - sorry...)
+
+For more presentations (without sound) see http://www.slideshare.net/cirrious/
+
+MvvmCross made it briefly to Channel9 - see http://slodge.blogspot.co.uk/2012/06/mvvmcross-on-channel9.html
+
+MvvmCross was at BUILD 2012 - see http://channel9.msdn.com/Events/Build/2012/3-004
+
+For International inspiration, see:
+
+    http://www.slideshare.net/Runegri/kryssplatform-mobilutvikling
+    http://www.slideshare.net/dan_ardelean/mvvmcross-da-windows-phone-a-windows-8-passando-per-android-e-ios
+    http://www.e-naxos.com/Blog/post/Strategie-de-developpement-Cross-Platform-Partie-2.aspx
+
+Below are some key posts from http://slodge.blogspot.com , from http://stackoverflow.com/questions/tagged/mvvmcross and beyond...
 
 ###Portable Class Libraries
 
@@ -132,6 +148,8 @@ Using custom controls in XML - http://stackoverflow.com/questions/12934654/how-t
 Responding to checkbox changes - http://stackoverflow.com/questions/13120574/mvvmcross-vnext-checkbox-checkedchange-event-to-a-command-with-monodroid
 
 Integrating a custom Activity - http://stackoverflow.com/questions/13201174/insert-a-monogame-view-inside-mvvmcross-monodroid-activity
+
+Binding a spinner - http://blog.ostebaronen.dk/2012/08/mvvmcross-binding-spinner.html
 
 ###Touch
 
