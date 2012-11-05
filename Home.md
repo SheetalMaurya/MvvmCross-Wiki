@@ -70,6 +70,8 @@ Hunting for memory leaks - http://stackoverflow.com/questions/12494804/helping-t
 
 One pattern for error reporting - http://stackoverflow.com/questions/10411352/what-is-the-suggested-way-to-handle-exceptions-during-in-a-mvvmcross-application and also at http://stackoverflow.com/questions/11053535/alerts-or-popups-in-mvvmcross
 
+Returning Results from ViewModels - http://www.gregshackles.com/2012/11/returning-results-from-view-models-in-mvvmcross/
+
 ###Testing
 
 Testing ViewModels - http://slodge.blogspot.co.uk/2012/10/testing-viewmodels-in-mvvmcross.html
