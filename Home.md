@@ -34,6 +34,8 @@ Or maybe you just want Android data binding?
 
 For setting up your development environment to support portable libraries, see the steps in http://slodge.blogspot.co.uk/2012/09/mvvmcross-vnext-portable-class.html
 
+For a video of a talk I've given a couple of times about end-to-end C# development, see http://slodge.blogspot.co.uk/2012/11/azure-to-wpmonodroidmonotouch-video-of.html
+
 http://vimeo.com/39019207 provides a video of me talking about this project (with poor noise quality - sorry...)
 
 For more presentations (without sound) see http://www.slideshare.net/cirrious/
