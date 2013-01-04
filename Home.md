@@ -197,6 +197,8 @@ Another introduction to Conventional plugins - http://stackoverflow.com/question
 
 Changes to IoC in vNext - http://slodge.blogspot.co.uk/2012/10/changes-to-ioc-in-vnext.html
 
+[[SQLite Plugin]]
+
 ###"Simple Projects"
 
 Multiple View/ViewModel sample - http://stackoverflow.com/questions/10430481/how-do-i-use-multiple-viewmodels-with-simple-binding
