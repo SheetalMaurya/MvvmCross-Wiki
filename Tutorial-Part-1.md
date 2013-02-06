@@ -11,7 +11,7 @@
 
 We start with a portable class library project on Windows.
 
-The source for the finished tutorial is in: [no link yet]
+The source for the finished tutorial is in: https://skydrive.live.com/?cid=d3d039f88037aad4&id=D3D039F88037AAD4!107#cid=D3D039F88037AAD4&id=D3D039F88037AAD4%21139
 
 ## Create a new empty Solution
 
