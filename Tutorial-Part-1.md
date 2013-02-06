@@ -1,26 +1,38 @@
+## Requirements
+
+* Visual Studio 2012 or Visual Studio 2010 with PCL support (no Express versions of VS!). 
+* VisualStudio plugin for MonoAndroid installed
+* PCL support for MonoAndroid. Look here: http://slodge.blogspot.co.uk/2012/12/cross-platform-winrt-monodroid.html Note: You don't need MonoTouch support in VisualStudio
+* WindowsPhone SDK installed
+* For iOS development: A Mac with MonoTouch installed and a prepaired targets file. See here: http://slodge.blogspot.co.uk/2013/01/if-pcls-will-not-build-for-you-in.html
+* The MvvmCross binaries: http://slodge.blogspot.co.uk/p/mvvmcross-binaries_7.html (You can compile them by yourself but this can be painful. This tutorial is tested with the binaries from 2013_01_28.) 
+
 ## Building a new MvvmCross application
 
-We start with a MonoDroid project on Windows... mainly because we find the Visual Studio tooling is the easiest to use, especially with Resharper installed.
+We start with a portable class library project on Windows.
 
-The source for the finished tutorial is in: https://github.com/slodge/MvvmCross/tree/master/Sample%20-%20Tutorial/Tutorial
+The source for the finished tutorial is in: [no link yet]
 
 ## Create a new empty Solution
 
-In this case we will just call it "Tutorial"
+In this case we will just call it "Tutorial".
+
+Go to the Windows Explorer and create a folder MvvmCross inside your Tutorial folder. 
+Extract the archive BuiltInVS2012 into the folder MvvmCross.
+Rename the folder bin to VS2012.
+Extract the archive BuiltInMonoTouch into the folder MvvmCross.
+Rename the folder bin to MonoTouch.
 
 ![Add solution](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/1.png)
 
-Add the existing projects Cirrious.Mvvm.Android and Cirrious.Mvvm.Binding.Android to your solution (later this step will be replaced with simlpy adding assembly references instead of source code inconclusion)
-
-## Android
+## Portable Class Library
 
 ### Build the "Core" project - the Assembly containing the ViewModels
 
-Start a new MonoDroid Class Library project - in this case we create it with name Tutorial.Core, and then rename it afterwards to Tutorial.Core.Droid
+Start a new Portable Class Library project for Profile104 and name it Tutorial.Core.
+Profile104 is for .Net Framework 4.5, Silverlight 4, WindowsPhone 7.5 and Mono For Android.
 
-![Create Droid Library project](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/2.png)
-
-Add a reference for Cirrious.Mvvm.Android to this new class library.
+Add a reference for MvvmCross\VS2012\Portable\Release\Cirrious.MvvmCross.dll to this new portable class library.
 
 Delete Class1.cs
 
@@ -29,7 +41,6 @@ Create a new folder and call it ViewModels
 Create a new class in the ViewModels and call it MainMenuViewModel. 
 
 In this class:
-- remove all the Android specific using statements - e.g. `using Android.App;`
 - add MvxViewModel as a base class
 - add a public property which will be the list of menu items available
 
@@ -56,7 +67,6 @@ namespace Tutorial.Core.ViewModels
 Obviously right now we're missing any Items, so let's add one. Create a new ViewModel class ViewModels/Lessons/SimpleTextPropertyViewModel.cs
 
 In this class:
-- remove all the Android specific using statements - e.g. `using Android.App;`
 - add MvxViewModel as a base class
 - add a public property which will be the text we are going to play with - this time making it a private field backed property and including a FirePropertyChanged notification
 
@@ -79,7 +89,7 @@ namespace Tutorial.Core.ViewModels.Lessons
         public string TheText
         {
             get { return _theText; }
-            set { _theText = value; FirePropertyChanged("TheText"); }
+            set { _theText = value; RaisePropertyChanged("TheText"); }
         }
 
         public SimpleTextPropertyViewModel()
@@ -133,7 +143,10 @@ namespace Tutorial.Core.Converters
             var stringValue = value as string;
             if (string.IsNullOrEmpty(stringValue))
                 return string.Empty;
-            return new string(stringValue.Reverse().ToArray());
+
+            char[] arr = stringValue.ToCharArray();
+            Array.Reverse(arr);
+            return new string(arr);
         }
     }
 }
@@ -166,15 +179,20 @@ Back in MainMenuViewModel you can now add this SimpleTextPropertyViewModel class
         }
 ```
 
-And we also want a way to navigate to the new ViewModel. To do that, add an IMvxCommand to your MainMenuViewModel class:
+And we also want a way to navigate to the new ViewModel. To do that, add an ICommand to your MainMenuViewModel class (you need the namespaces System.Windows.Input and Cirrious.MvvmCross.Commands):
 ```
-        public IMvxCommand ShowItemCommand
+    public ICommand ShowItemCommand
+    {
+        get 
         {
-            get
-            {
-                return new MvxRelayCommand<Type>((type) => this.RequestNavigate(type));
-            }
+		return new MvxRelayCommand<Type>((type) => DoShowItem(type));
         }
+    }
+
+		public void DoShowItem(Type itemType)
+		{
+			this.RequestNavigate(itemType);
+		}
 ```
 
 With this in place, all we need left to do in the Core project is to create the main application class and a "start object".
@@ -209,7 +227,7 @@ namespace Tutorial.Core.ApplicationObjects
 }
 ```
 
-Now in the root of the Tutorial.Core.Droid project, create an App object. In more complex projects this App might have a lot to build and own on application startup, but for our Tutorial here, the App has only to create and register the start object:
+Now in the root of the Tutorial.Core project, create an App object. In more complex projects this App might have a lot to build and own on application startup, but for our Tutorial here, the App has only to create and register the start object:
 
 ```
 using System;
@@ -226,7 +244,7 @@ namespace Tutorial.Core
 {
     public class App
         : MvxApplication
-        , IMvxServiceProducer<IMvxStartNavigation>
+        , IMvxServiceProducer
     {
         public App()
         {
@@ -245,16 +263,18 @@ Add a new project to your solution - a Mono for Android application with name Tu
 
 Add references to the new project for: 
 
-- Cirrious.MvvmCross.Android
+- Cirrious.MvvmCross
+- Cirrious.MvvmCross.Droid
 - Cirrious.MvvmCross.Binding.Android
-- Tutorial.Core.Droid
+- System.Net.dll and System.Windows.dll (saved in the Droid specific MvvmCross folder!)
+- Tutorial.Core
 
-Add a link to the /Resources/Values to the resource file Cirrious.MvvmCross.Binding.Android/ResourcesToCopy/MvxBindingAttribute.xml - then make sure this file type is set to AndroidResource. Doing this copies in the required identifiers into your local project resources, enabling the Android SDK to generate some unique integer identifier for them.
+Add a file MvxBindingAttribute.xml to the /Resources/Values and fill it with [this content](https://github.com/slodge/MvvmCross/blob/vnext/Cirrious/Cirrious.MvvmCross.Binding.Droid/ResourcesToCopy/MvxBindingAttributes.xml) - then make sure this file type is set to AndroidResource. Doing this copies in the required identifiers into your local project resources, enabling the Android SDK to generate some unique integer identifier for them.
 
 Now, lets create some Views...
 
 First the resources:
-In Resources/Layout, add a new file "ListItem_ViewModel.axml" - this is the template for each individual ListItem:
+In Resources/Layout, add a new Android Layout "ListItem_ViewModel.axml" - this is the template for each individual ListItem:
 ```
 <?xml version="1.0" encoding="utf-8"?>
 <TextView 
@@ -269,7 +289,10 @@ In Resources/Layout, add a new file "ListItem_ViewModel.axml" - this is the temp
         />
 ```
 
+NOTE: In case the Android designer escapes the single quotes to &amp;apos; then you should open the .axml file with Visual Studio's XML (Text-)Editor instead.   
+
 Within this, notice that this is fairly normal Android XML - except that we have added a local namespace for our Tutorial Assembly and we have added a Binding attribute `local:MvxBind="{'Text':{'Path':'Name'}}"` - what this binding attribute contains is some simple JSON which tells the Mvx framework to fill the TextView's Text property from the .Name property of whatever object is attached.
+You can ignore the warnings about the undefined MvxBind attribute. 
 
 With that item template done, now add Page_MainMenuView.axml - which will show our main menu... In the XML for this, type:
 ```
@@ -284,7 +307,7 @@ With that item template done, now add Page_MainMenuView.axml - which will show o
   />
 ```
 
-As before, this is fairly normal android XML, excpept that we now have two new local attributes:
+As before, this is fairly normal android XML, except that we now have two new local attributes:
 
 - local:MvxBind which this time contains a JSON object with two binding instructions - the first for ItemsSource, the second for ItemClick.
 - local:MvxItemTemplate which contains a reference to the ListItem_ViewModel.axml file from above. Notice that the capitalization on this reference is a bit unusual - sometimes Android just insists you use lower case.
@@ -295,7 +318,7 @@ Within Views, add a new class called MainMenuView, inherit this class from a Mvx
 
 ```
 using Android.App;
-using Cirrious.MvvmCross.Binding.Android.Views;
+using Cirrious.MvvmCross.Binding.Droid.Views;
 using Tutorial.Core.ViewModels;
 
 namespace Tutorial.UI.Droid.Views
@@ -320,9 +343,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Android.Content;
-using Cirrious.MvvmCross.Android.Platform;
+using Cirrious.MvvmCross.Droid.Platform;
 using Cirrious.MvvmCross.Application;
-using Cirrious.MvvmCross.Binding.Android;
+using Cirrious.MvvmCross.Binding.Droid;
 using Tutorial.Core;
 using Tutorial.Core.ViewModels;
 using Tutorial.UI.Droid.Views;
@@ -349,8 +372,8 @@ Rename Activity1 to SplashScreenActivity, and change the code inside the class t
 ```
 using Android.App;
 using Android.OS;
-using Cirrious.MvvmCross.Android.Platform;
-using Cirrious.MvvmCross.Android.Views;
+using Cirrious.MvvmCross.Droid.Platform;
+using Cirrious.MvvmCross.Droid.Views;
 
 namespace Tutorial.UI.Droid
 {
@@ -376,6 +399,16 @@ where SplashScreen.axml looks like:
     android:gravity="center"
     android:text="@string/Loading"
     />
+```
+
+Define the string with the name "Loading" by editing the file Strings.xml in Resources\Values so that it looks like this:
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Loading">Loading</string>
+    <string name="ApplicationName">Tutorial.UI.Droid</string>
+</resources>
 ```
 
 At this point you can run the app and see a single item list... not very exciting, and when you click on the list item, you'll generate a KeyNotFoundException, because we have no View registered for our SimpleTextPropertyViewModel
@@ -447,10 +480,10 @@ To enable this XML to be loaded, add an Activity for our View:
 
 ```
 using Android.App;
-using Cirrious.MvvmCross.Binding.Android.Views;
+using Cirrious.MvvmCross.Binding.Droid.Views;
 using Tutorial.Core.ViewModels.Lessons;
 
-namespace Tutorial.UI.Droid.Views.Lessons
+namespace Tutorial.UI.Droid.Views
 {
     [Activity]
     public class SimpleTextPropertyView
@@ -464,9 +497,9 @@ namespace Tutorial.UI.Droid.Views.Lessons
 }
 ```
 
-and then change Setup.cs tp:
+and then change Setup.cs to:
 
-- override the FillValueConverters method in order to register our Value Converters with the Mvx framework:
+- override the FillValueConverters method in order to register our Value Converters with the Mvx framework (you need the namespace Tutorial.Core.Converters):
 
 ```
         protected override IEnumerable<Type> ValueConverterHolders
@@ -491,19 +524,45 @@ In Android and WP7, XML-driven RelativeLayouts, LinearLayouts, StackPanels and G
 
 The technique used in this tutorial is to use a branch of MonoTouch.Dialog to achieve a "StackPanel-like" effect. If you prefer, however, to create you UI using code or using a XIB file, then check out some of the other tutorials - MvvmCross supports these as the binding can work on any target which supports public Properties and public events.
 
-### Build the "Core" project - the Assembly containing the ViewModels
+### Prepare the solution for MonoTouch on Mac
 
-The code for the Core in Touch is 100% identical to the code for the Android Core.
+Open the file Tutorial.Core.csproj in a text editor and replace this:
 
-To build this
+```   
+<TargetFrameworkProfile>Profile104</TargetFrameworkProfile>
+```
 
-- Add the Cirrious.MvvmCross.Touch, Cirrious.MvvmCross.Binding.Touch, Cirrious.MvvmCross.Dialog.Touch and our special MonoTouch.Dialog projects to your solution
-- Create a new MonoTouch class library project.
-- Delete the Class1.cs file
-- Then do some "unload-finder or windows explorer based copy and paste-reload" magic to get the new .csproj file into the /Tutorial.Core directory and loaded into your solution
-- Then in the solution in MonoDevelop or Visual Studio, copy and paste all the files from the Core Android project into your Core Touch project
-- Then add a reference to Cirrious.MvvmCross.Touch
-- And that's it - it's the same code!
+with:
+
+```
+<TargetFrameworkProfile Condition="'$(OS)' != 'Windows_NT'">Profile1</TargetFrameworkProfile>      
+<TargetFrameworkProfile Condition="'$(OS)' == 'Windows_NT'">Profile104</TargetFrameworkProfile>
+```
+For more information take a look here: http://slodge.blogspot.de/2012/10/a-temporary-solution-for-profile1-only.html
+
+For iOS you must reference the MvvmCross binaries built with MonoTouch. To do this you can change the binary files in the referenced folder. If you do it this way then you must change tghe files every time you switch between Mac and Windows.
+To avoid this you can use conditional compiling for your references. 
+
+So, replace this:
+
+```   
+<Reference Include="Cirrious.MvvmCross">
+  <HintPath>..\MvvmCross\VS2012\Portable\Release\Cirrious.MvvmCross.dll</HintPath>
+</Reference>
+```
+
+with:
+
+```
+<Reference Include="Cirrious.MvvmCross" Condition="'$(OS)' == 'Windows_NT'">
+  <HintPath>..\MvvmCross\VS2012\Portable\Release\Cirrious.MvvmCross.dll</HintPath>
+</Reference>
+<Reference Include="Cirrious.MvvmCross" Condition="'$(OS)' != 'Windows_NT'">
+  <HintPath>..\MvvmCross\MonoTouch\Touch\Release\Cirrious.MvvmCross.dll</HintPath>
+</Reference>
+```
+
+Now the project is prepared for use on both platforms. Copy the Tutorial solution folder to your Mac and open the solution with MonoDevelop and rebuild the Tutorial.Core portable class library. 
 
 ### Build the "MonoTouch UI" project - the User Interface specifically for iOS/MonoTouch
 
@@ -513,10 +572,17 @@ Add a new project to your solution - an iPhone single view application with name
 
 Add references to the new project for: 
 
+- Cirrious.MvvmCross (use the same file as referenced in the Core project for iOS)
+- Cirrious.MvvmCross.Binding
 - Cirrious.MvvmCross.Touch
 - Cirrious.MvvmCross.Binding.Touch
 - Cirrious.MvvmCross.Dialog.Touch (which includes a modified version of MonoTouch.Dialog)
-- Tutorial.Core.Touch
+- Cirrious.MvvmCross.Plugins.Location.Touch
+- Cirrious.MvvmCross.Plugins.ThreadUtils.Touch
+- Cirrious.MvvmCross.Plugins.File.Touch
+- Cirrious.MvvmCross.Plugins.DownloadCache.Touch
+- CrossUI.Touch
+- Tutorial.Core
 
 Then delete the default generated ViewController and its XIB
 
@@ -524,32 +590,49 @@ Now, lets create some Views...
 
 First create the Views folder.
 
-Then create a class MainMenuView.cs. This class needs to inherit from a table view controller and needs to have access to a MainMenuViewModel - so the base class is MvxTouchTableViewController<MainMenuViewModel>.
+Then create a class MainMenuView.cs. This class needs to inherit from a table view controller and needs to have access to a MainMenuViewModel - so the base class is MvxBindingTouchTableViewController<MainMenuViewModel>.
 
 We then also need to add some basic binding support to the class:
 
 ```
+using System;
+using System.Collections.Generic;
+using Cirrious.MvvmCross.Binding.Interfaces;
+using Cirrious.MvvmCross.Binding.Touch.ExtensionMethods;
+using Cirrious.MvvmCross.Binding.Touch.Views;
+using Cirrious.MvvmCross.ExtensionMethods;
+using Cirrious.MvvmCross.Interfaces.ServiceProvider;
+using Cirrious.MvvmCross.Views;
+using MonoTouch.Foundation;
+using MonoTouch.UIKit;
+using Tutorial.Core.ViewModels;
+using Cirrious.MvvmCross.Touch.Views;
+
+namespace Tutorial.UI.Touch
+{
 	public class MainMenuView
-		: MvxTouchTableViewController<MainMenuViewModel>
-		, IMvxServiceConsumer<IMvxBinder>
+		: MvxBindingTouchTableViewController<MainMenuViewModel>
 	{
 		private readonly List<IMvxUpdateableBinding> _bindings;
 
-        public MainMenuView(MvxShowViewModelRequest request)
-            : base(request)
+		public MainMenuView (MvxShowViewModelRequest request)
+			: base(request)
 		{
 			_bindings = new List<IMvxUpdateableBinding>();
 		}
-		
+
 		protected override void Dispose (bool disposing)
 		{
-			if (disposing)
+			if (disposing) 
 			{
-                _bindings.ForEach(x => x.Dispose());
+				_bindings.ForEach(x => x.Dispose());
 			}
-			
+
 			base.Dispose(disposing);
 		}
+
+	}
+}
 ```
 
 Beyond this, the binding itself happens in ViewDidLoad() - in this class we setup binding for both a Table Delegate and a Table Source:
@@ -561,16 +644,16 @@ Beyond this, the binding itself happens in ViewDidLoad() - in this class we setu
 
             Title = "Views";
 
-            var tableDelegate = new MvxBindableTableViewDelegate();
-            tableDelegate.SelectionChanged += (sender, args) => ViewModel.ShowItemCommand.Execute(args.AddedItems[0]);
-            var tableSource = new TableViewDataSource(TableView);
+            var tableSource = new TableViewSource(TableView);
+            tableSource.SelectionChanged += (sender, args) => ViewModel.DoShowItem((Type)args.AddedItems[0]);
+            
+            this.AddBindings(
+                new Dictionary<object, string>()
+                    {
+                        { tableSource, "{'ItemsSource':{'Path':'Items'}}" }
+                    });
 
-            var binder = this.GetService<IMvxBinder>();
-            _bindings.AddRange(binder.Bind(ViewModel, tableDelegate, "{'ItemsSource':{'Path':'Items'}}"));
-            _bindings.AddRange(binder.Bind(ViewModel, tableSource, "{'ItemsSource':{'Path':'Items'}}"));
-
-            TableView.Delegate = tableDelegate;
-            TableView.DataSource = tableSource;
+            TableView.Source = tableSource;
             TableView.ReloadData();
         }
 ```
@@ -579,55 +662,55 @@ Finally, the actual TableSource we use in this class, along with the UITableCell
 
 - The Source:
 ```
-        public class TableViewDataSource : MvxBindableTableViewDataSource
-        {
-            static readonly NSString CellIdentifier = new NSString("TableViewCell");
-
-            public TableViewDataSource(UITableView tableView)
-                : base(tableView)
-            {
-            }
-
-            protected override UITableViewCell GetOrCreateCellFor(UITableView tableView, NSIndexPath indexPath, object item)
-            {
-                var reuse = tableView.DequeueReusableCell(CellIdentifier);
-                if (reuse != null)
-                    return reuse;
-
-                var toReturn = new TableViewCell(UITableViewCellStyle.Subtitle, CellIdentifier)
-                                   {Accessory = UITableViewCellAccessory.DisclosureIndicator};
-                return toReturn;
-            }
-        }
+	public class TableViewSource : MvxBindableTableViewSource
+	{
+		static readonly NSString CellIdentifier = new NSString("TableViewCell");
+		
+		public TableViewSource(UITableView tableView)
+			: base(tableView)
+		{
+		}
+		
+		protected override UITableViewCell GetOrCreateCellFor(UITableView tableView, NSIndexPath indexPath, object item)
+		{
+			var reuse = tableView.DequeueReusableCell(CellIdentifier);
+			if (reuse != null)
+				return reuse;
+			
+			var toReturn = new TableViewCell(UITableViewCellStyle.Subtitle, CellIdentifier);
+			return toReturn;
+		}
+	}
 ```
 
 The cell:
 
 ```
-        public class TableViewCell
+        public sealed class TableViewCell
             : MvxBindableTableViewCell
         {
-            public static readonly MvxBindingDescription[] BindingDescriptions
-                = new[]
-                  {
-                      new MvxBindingDescription()
-                          {
-                              TargetName = "TitleText",
-                              SourcePropertyPath = "Name"
-                          },
-                      new MvxBindingDescription()
-                          {
-                              TargetName = "DetailText",
-                              SourcePropertyPath = "FullName"
-                          },
-                  };
+            public const string BindingText = @"{'TitleText':{'Path':'Name'},'DetailText':{'Path':'FullName'}}";
 
-            // if you don't want to code the MvxBindingDescription, then a string could instead be used:
-            //public const string BindingText = @"{'TitleText':{'Path':'Name'},'DetailText':{'Path':'FullName'}}";
+            // if you don't want to JSON text, then you can use MvxBindingDescription in C#, instead:
+            //public static readonly MvxBindingDescription[] BindingDescriptions
+            //    = new[]
+            //      {
+            //          new MvxBindingDescription()
+            //              {
+            //                  TargetName = "TitleText",
+            //                  SourcePropertyPath = "Name"
+            //              },
+            //          new MvxBindingDescription()
+            //              {
+            //                  TargetName = "DetailText",
+            //                  SourcePropertyPath = "FullName"
+            //              },
+            //      };
 
             public TableViewCell(UITableViewCellStyle cellStyle, NSString cellIdentifier)
-                : base(BindingDescriptions, cellStyle, cellIdentifier)
+                : base(BindingText, cellStyle, cellIdentifier)
             {
+                Accessory = UITableViewCellAccessory.DisclosureIndicator;
             }
         }
 ```
@@ -635,6 +718,18 @@ The cell:
 For the second View, the SimpleTextPropertyView we use MonoTouch.Dialog as the base class. This makes the code much, much more straightforward than for the previous MainMenuView:
 
 ```
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Cirrious.MvvmCross.Dialog.Touch;
+using Cirrious.MvvmCross.Views;
+using MonoTouch.UIKit;
+using Tutorial.Core.ViewModels.Lessons;
+using CrossUI.Touch.Dialog.Elements;
+
+namespace Tutorial.UI.Touch.Views.Lessons
+{
     public class SimpleTextPropertyView
          : MvxTouchDialogViewController<SimpleTextPropertyViewModel>
     {
@@ -650,7 +745,7 @@ For the second View, the SimpleTextPropertyView we use MonoTouch.Dialog as the b
             this.NavigationItem.SetLeftBarButtonItem(new UIBarButtonItem("Cancel", UIBarButtonItemStyle.Bordered, null), false);
             this.NavigationItem.LeftBarButtonItem.Clicked += delegate
             {
-                ViewModel.BackCommand.Execute();
+                ViewModel.DoClose();
             };
 
             this.Root = new RootElement("Simple Text Property")
@@ -668,6 +763,7 @@ For the second View, the SimpleTextPropertyView we use MonoTouch.Dialog as the b
                             };
         }
     }
+}
 ```
 
 Note that for our iOS View, we have to manually add a Cancel/Back button - this is because iOS does not provide a physical Back Button at the hardware level.
@@ -677,6 +773,25 @@ With these views coded, then there's just a little housekeeping to do:
 1. Create a Setup class: to create the App object; to provide the View-ViewModel mapping; and to register our converters.
 
 ```
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Cirrious.MvvmCross.Application;
+using Cirrious.MvvmCross.Dialog.Touch;
+using Cirrious.MvvmCross.Touch.Interfaces;
+using Cirrious.MvvmCross.Binding.Binders;
+using Cirrious.MvvmCross.Touch.Platform;
+using Tutorial.Core;
+using Tutorial.Core.Converters;
+using Tutorial.Core.ViewModels;
+using Tutorial.Core.ViewModels.Lessons;
+using Tutorial.UI.Touch.Views;
+using Tutorial.UI.Touch.Views.Lessons;
+using Cirrious.MvvmCross.Platform;
+
+namespace Tutorial.UI.Touch
+{
     public class Setup
         : MvxTouchDialogBindingSetup
     {
@@ -685,29 +800,56 @@ With these views coded, then there's just a little housekeeping to do:
         {
         }
 
+        #region Overrides of MvxBaseSetup
+
         protected override MvxApplication CreateApp()
         {
             var app = new App();
             return app;
         }
-		
+
         protected override IEnumerable<Type> ValueConverterHolders
         {
             get { return new[] { typeof(Converters) }; }
         }
+
+		protected override void AddPluginsLoaders(MvxLoaderPluginRegistry registry)
+		{
+			registry.AddConventionalPlugin<Cirrious.MvvmCross.Plugins.Location.Touch.Plugin>();
+			registry.AddConventionalPlugin<Cirrious.MvvmCross.Plugins.ThreadUtils.Touch.Plugin>();
+			registry.AddConventionalPlugin<Cirrious.MvvmCross.Plugins.File.Touch.Plugin>();
+			registry.AddConventionalPlugin<Cirrious.MvvmCross.Plugins.DownloadCache.Touch.Plugin>();
+			base.AddPluginsLoaders(registry);
+		}
+        #endregion
     }
+}
 ```
 
 2. Change the appdelegate class so that it creates and starts our setup.cs process
 
 ```
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Cirrious.MvvmCross.ExtensionMethods;
+using Cirrious.MvvmCross.Interfaces.ServiceProvider;
+using Cirrious.MvvmCross.Interfaces.ViewModels;
+using Cirrious.MvvmCross.Touch.Platform;
+using Cirrious.MvvmCross.Touch.Views;
+using Cirrious.MvvmCross.Touch.Views.Presenters;
+using MonoTouch.Foundation;
+using MonoTouch.UIKit;
+
+namespace Tutorial.UI.Touch
+{
     // The UIApplicationDelegate for the application. This class is responsible for launching the 
     // User Interface of the application, as well as listening (and optionally responding) to 
     // application events from iOS.
     [Register("AppDelegate")]
     public partial class AppDelegate
         : MvxApplicationDelegate
-        , IMvxServiceConsumer<IMvxStartNavigation>
+        , IMvxServiceConsumer
     {
         // class-level declarations
         UIWindow window;
@@ -724,7 +866,7 @@ With these views coded, then there's just a little housekeeping to do:
             window = new UIWindow(UIScreen.MainScreen.Bounds);
 
             // initialize app for single screen iPhone display
-            var presenter = new MvxTouchSingleViewsPresenter(this, window);
+            var presenter = new MvxTouchViewPresenter(this, window);
             var setup = new Setup(this, presenter);
             setup.Initialize();
 
@@ -732,9 +874,12 @@ With these views coded, then there's just a little housekeeping to do:
             var start = this.GetService<IMvxStartNavigation>();
             start.Start();
 
+            window.MakeKeyAndVisible();
+
             return true;
         }
     }
+}
 ```
 
 With that house-keeping done our app should now run:
@@ -753,23 +898,6 @@ And we should be able to see databinding of dynanmic changes too:
 
 For most WP7 engineers this will be quite simple and straight-forward - as MVVM is a standard thing to use on WP7/Silverlight apps.
 
-### Build the "Core" project - the Assembly containing the ViewModels
-
-The code for the Core is 100% identical to the code for the Android and Touch Cores.
-
-To build this:
-
-- Add the Cirrious.MvvmCross.WindowsPhone project to your solution
-- Create a new WindowsPhone class library project.
-
-![Add project](https://github.com/slodge/MvvmCross/raw/master/Sample%20-%20Tutorial/Help/w1.png)
-
-- Delete the Class1.cs file
-- Then do some "unload-windows explorer based copy and paste-reload" magic to get the new .csproj file into the /Tutorial.Core directory and loaded into your solution
-- Then in the solution in Visual Studio, copy and paste all the files from the Core Android project into your Core WindowsPhone project
-- Then add a reference to Cirrious.MvvmCross.WindowsPhone
-- And that's it - it's the same code!
-
 ### Build the "Windows Phone UI" project - the User Interface specifically for Windows Phone
 
 Add a new project to your solution - a WindowsPhone application with name Tutorial.UI.WindowsPhone
@@ -778,8 +906,15 @@ Add a new project to your solution - a WindowsPhone application with name Tutori
 
 Add references to the new project for: 
 
+- Cirrious.MvvmCross
 - Cirrious.MvvmCross.WindowsPhone
-- Tutorial.Core.WindowsPhone
+- Tutorial.Core
+- System.Windows.Interactivity
+- Cirrious.MvvmCross.Plugins.ThreadUtils.WindowsPhone
+- Cirrious.MvvmCross.Plugins.Location.WindowsPhone
+- Cirrious.MvvmCross.Plugins.Visibility.WindowsPhone
+- Cirrious.MvvmCross.Plugins.Visibility
+- Cirrious.MvvmCross.Plugins.Json
 
 Now, lets create some Views...
 
@@ -845,10 +980,9 @@ With that done, we again need to add some housekeeping:
 using System;
 using System.Collections.Generic;
 using Cirrious.MvvmCross.Application;
+using Cirrious.MvvmCross.Platform;
 using Cirrious.MvvmCross.WindowsPhone.Platform;
 using Microsoft.Phone.Controls;
-using Tutorial.Core.ViewModels;
-using Tutorial.UI.WindowsPhone.Views;
 
 namespace Tutorial.UI.WindowsPhone
 {
@@ -864,6 +998,26 @@ namespace Tutorial.UI.WindowsPhone
         {
             var app = new Core.App();
             return app;
+        }
+
+        protected override void InitializeDefaultTextSerializer()
+        {
+            Cirrious.MvvmCross.Plugins.Json.PluginLoader.Instance.EnsureLoaded(true);
+        }
+
+        protected override void AddPluginsLoaders(MvxLoaderPluginRegistry registry)
+        {
+            registry.AddConventionalPlugin<Cirrious.MvvmCross.Plugins.ThreadUtils.WindowsPhone.Plugin>();
+            registry.AddConventionalPlugin<Cirrious.MvvmCross.Plugins.Location.WindowsPhone.Plugin>();
+            registry.AddConventionalPlugin<Cirrious.MvvmCross.Plugins.Visibility.WindowsPhone.Plugin>();
+            base.AddPluginsLoaders(registry);
+        }
+
+        protected override void InitializeLastChance()
+        {
+            Cirrious.MvvmCross.Plugins.Visibility.PluginLoader.Instance.EnsureLoaded();
+
+            base.InitializeLastChance();
         }
     }
 }
@@ -898,7 +1052,7 @@ namespace Tutorial.UI.WindowsPhone
         }
 ```
 
-- to make this compile, you will need to add inheritance on the App.xaml class to the interface `IMvxServiceConsumer<IMvxStartNavigation>` and you will need to include some using statements:
+- to make this compile, you will need to add inheritance on the App.xaml class to the interface `IMvxServiceConsumer` and you will need to include some using statements:
 
 ```
 using Cirrious.MvvmCross.ExtensionMethods;
@@ -974,17 +1128,41 @@ Now, add some xaml content to support the ViewModel binding:
             </StackPanel>
 ```
 
+You need to create special converters for WindowsPhone. Create a folder NativeConverters. Inside this folder create the classes StringLengthValueConverter and StringReverseValueConverter. They should look like this:
+
+```
+using Cirrious.MvvmCross.WindowsPhone.Platform.Converters;
+
+namespace Tutorial.UI.WindowsPhone.NativeConverters
+{
+    public class StringLengthValueConverter : MvxNativeValueConverter<Core.Converters.StringLengthValueConverter>
+    {
+    }
+}
+```
+
+```
+using Cirrious.MvvmCross.WindowsPhone.Platform.Converters;
+
+namespace Tutorial.UI.WindowsPhone.NativeConverters
+{
+    public class StringReverseValueConverter : MvxNativeValueConverter<Core.Converters.StringReverseValueConverter>
+    {
+    }
+}
+```
+
 Now, just the house keeping to go:
 
 - add the Converters as a resource to the App.xaml:
 ```
     <Application.Resources>
-        <Converters:StringReverseValueConverter x:Key="StringReverseValueConverter"/>
-        <Converters:StringLengthValueConverter x:Key="StringLengthValueConverter"/>
+        <NativeConverters:StringReverseValueConverter x:Key="StringReverseValueConverter"/>
+        <NativeConverters:StringLengthValueConverter x:Key="StringLengthValueConverter"/>
     </Application.Resources>
 ```
 
-where the namespace import is: `xmlns:Converters="clr-namespace:Tutorial.Core.Converters;assembly=Tutorial.Core.WindowsPhone"`
+where the namespace import is: `xmlns:NativeConverters="clr-namespace:Tutorial.UI.WindowsPhone.NativeConverters"`
 
 That's it - the app should now run...
 
