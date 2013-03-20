@@ -39,8 +39,10 @@ No-one really needs a `Class1` :)
 
 Use 'Add references' to add links to the 2 Portable Class Libraries.
 
-* **Cirrious.CrossCore.dll** - core interfaces and concepts including Trace, IoC and Plugin management
-* **Cirrious.MvvmCross.dll** - Mvvm classes - including base classes for your MvxApplication and your MvxViewModels
+* **Cirrious.CrossCore.dll** 
+   - core interfaces and concepts including Trace, IoC and Plugin management
+* **Cirrious.MvvmCross.dll** 
+   - Mvvm classes - including base classes for your MvxApplication and your MvxViewModels
 
 Normally these will be found in a folder path like *{SolutionRoot}/Libs/Mvx/Portable/*
 
