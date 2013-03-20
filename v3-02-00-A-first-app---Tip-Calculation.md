@@ -1,6 +1,8 @@
-In this first Model-View-ViewModel project, we’ll create:
+In this first Model-View-ViewModel project, we’ll create a simple single screen cross-platform application for calculating the tip at a restaurant.
 
-* A simple single screen cross-platform application for calculating percentage tip at a restaurant.
+Here's a sketch of where we hope to end up:
+
+TODO - sketch
 
 The goals of this first application are all about **introducing**:
 
