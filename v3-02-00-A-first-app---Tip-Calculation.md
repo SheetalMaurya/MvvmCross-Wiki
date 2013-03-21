@@ -2,7 +2,7 @@ In this first Model-View-ViewModel project, we’ll create a simple single scree
 
 Here's a sketch of where we hope to end up:
 
-TODO - sketch
+![Sketch](https://raw.github.com/slodge/MvvmCross/v3/v3Tutorial/Pictures/TipCalc_Sketch.png)
 
 The goals of this first application are all about **introducing**:
 
