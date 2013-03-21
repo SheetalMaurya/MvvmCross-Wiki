@@ -203,24 +203,35 @@ Just as we did with Android, I won't go into depth here about how to use the XIB
 
 Drag/drop from the 'Object Library' to add:
 
-* some UILabels for showing static text
-* a UITextField for editing the SubTotal
-* a UISlider for editing the Generosity
-* a UILabel for showing the Tip result
+* some UILabels for showing static text - these are like `TextBlock`s
+* a UITextField for editing the SubTotal - this is like a `TextBox`
+* a UISlider for editing the Generosity - this is like a `ProgressBar`
+* a UILabel for showing the Tip result  - this is like a `TextBlock`
 
-You should be able to quite quickly generate a design like:
+Using drag and drop, uou should be able to quite quickly generate a design similar to:
 
 ![design](https://raw.github.com/slodge/MvvmCross/v3/v3Tutorial/Pictures/TipCalc_Touch_Design.png)
 
 ### Create 'outlets' within the XIB editor
 
-To then link those UI displays to C# properties you need to open the 'Assistant Editor' from menu option 'View' -> 'Assistant Editor' -> 'Show Assistant Editor'
+Once you have your UI drawn, you can then link those UI displayed fields to ObjectiveC variables called outlets. After you have done this, then the Xamarin tools will then map those ObjectiveC fields to C# properties back in your iOS app.
 
-Once you have done this, then you can ctrl-click on the 3 SubTotal, Generosity and Tip fields and can drag the 'New Referencing Outlet' option for each to the Assistant Editor:
+To start doing this, you need to open the 'Assistant Editor' from menu option 'View' -> 'Assistant Editor' -> 'Show Assistant Editor' within xCode.
+
+Once you have done this, then you can ctrl-click (right click) on each of the 3 SubTotal, Generosity and Tip fields in turn. 
 
 ![outlet](https://raw.github.com/slodge/MvvmCross/v3/v3Tutorial/Pictures/TipCalc_Touch_Outlet.png)
 
-This should enable you to create three ObjectiveC variables:
+For each of them:
+
+- ctrl-click the UI field
+- this will 'pop up' a window listing the 'outlets and actions' available for this field
+- find the one marked 'New Referencing Outlet' 
+- click on the circle to the right of 'New Referencing Outlet' and drag that to the Assistant Editor.
+- drop the field on the assistant editor
+- it will then ask you to provide a name for your outlet option
+
+Following this process you should be able to create three ObjectiveC variables for the three fields:
 
 * `SubTotalTextField`
 * `GenerositySlider`
@@ -228,7 +239,8 @@ This should enable you to create three ObjectiveC variables:
 
 With this done, save your xCode changes (using the File Menu) and then exit xCode.
 
-### Edit the TipView.cs
+
+### Edit TipView.cs
 
 Back in Xamarin Studio, you should now see that the Xamarin products have updated the TipView.designer.cs file - it will now contain three `[Outlet]` properties with those same three names
 
