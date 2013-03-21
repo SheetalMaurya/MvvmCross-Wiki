@@ -160,7 +160,7 @@ To achieve the basic layout:
 
 - we'll add a local app namespace - **http://schemas.android.com/apk/res/TipCalc.UI.Droid** - this is just like adding a namespace in XAML.
 
-       <?xml version="1.0" encoding="utf-8"?>
+        <?xml version="1.0" encoding="utf-8"?>
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:local="http://schemas.android.com/apk/res/TipCalc.UI.Droid"
             android:orientation="vertical"
