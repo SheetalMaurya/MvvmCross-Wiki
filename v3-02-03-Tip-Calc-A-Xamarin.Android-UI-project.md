@@ -151,22 +151,22 @@ To achieve the basic layout:
 
 - we'll add a new AXML file and we'll edit it using either the Xamarin Android designer or the Visual Studio XML editor - the designer gives us a visual display, while the VS editro *sometimes* gives us XML Intellisense.
 
-    <?xml version="1.0" encoding="utf-8"?>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-    </LinearLayout>
+        <?xml version="1.0" encoding="utf-8"?>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+        </LinearLayout>
 
 - we'll add a local app namespace - **http://schemas.android.com/apk/res/TipCalc.UI.Droid** - this is just like adding a namespace in XAML.
 
-    <?xml version="1.0" encoding="utf-8"?>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:local="http://schemas.android.com/apk/res/TipCalc.UI.Droid"
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-    </LinearLayout>
+       <?xml version="1.0" encoding="utf-8"?>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:local="http://schemas.android.com/apk/res/TipCalc.UI.Droid"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+        </LinearLayout>
 
 - notice that this 'layout' is already by default a vertical `LinearLayout` - for XAMLites, this is like a `StackPanel`
 
