@@ -196,25 +196,25 @@ To achieve the basic layout:
 
   - an `EditText` for text data entry of the SubTotal - for XAMLites, this is a `TextBox`
 
-        <EditText
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            local:MvxBind="Text SubTotal" />
+            <EditText
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                local:MvxBind="Text SubTotal" />
 
   - a `SeekBar` for touch/slide entry of the Generosity - for XAMLites, this is like a `ProgressBar`
 
-        <SeekBar
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:max="40"
-            local:MvxBind="Progress Generosity" />
+            <SeekBar
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:max="40"
+                local:MvxBind="Progress Generosity" />
 
-- we'll add a `TextView` to disply the Tip that results from the calculation:
+ - we'll add a `TextView` to disply the Tip that results from the calculation:
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            local:MvxBind="Text Tip" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                local:MvxBind="Text Tip" />
 
 Put together, this looks like:
 
