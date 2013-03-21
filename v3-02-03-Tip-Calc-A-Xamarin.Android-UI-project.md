@@ -121,25 +121,32 @@ Most of this functionality is provided for you automatically. Within your Droid 
 
 For `TipCalc` here's all that is needed in Setup.cs:
 
-    public class Setup
-        : MvxAndroidSetup
+    using Android.App;
+    using Android.Content;
+    using Cirrious.MvvmCross.Droid.Platform;
+    using Cirrious.MvvmCross.Droid.Views;
+    using Cirrious.MvvmCross.ViewModels;
+    using TipCalc.Core;
+
+    namespace TipCalc.UI.Droid
     {
-        public Setup(Context applicationContext)
-            : base(applicationContext)
+        public class Setup : MvxAndroidSetup
         {
-        }
+            public Setup(Context applicationContext) : base(applicationContext)
+            {
+            }
 
-        protected override IMvxApplication CreateApp()
-        {
-            return new TipCalc.Core.App();
-        }
+            protected override IMvxApplication CreateApp()
+            {
+                return new App();
+            }
 
-        protected override IMvxNavigationRequestSerializer CreateNavigationRequestSerializer()
-        {
-            Cirrious.MvvmCross.Plugins.Json.PluginLoader.Instance.EnsureLoaded();
-            return new MvxJsonNavigationSerializer();
+            protected override IMvxNavigationSerializer CreateNavigationSerializer()
+            {
+                Cirrious.MvvmCross.Plugins.Json.PluginLoader.Instance.EnsureLoaded(true);
+                return new MvxJsonNavigationSerializer();
+            }
         }
-    }
 
 **Note:** You may wonder why the Json Navigation is initialized within your `Setup` code, while so much else initialization is done automatically for you. The reason behind this lies in the effort MvvmCross makes to minimize dependencies on external projects. By not including JSON.Net as a reference within MvvmCross itself, this enables developers to later choose a completely different serialization mechanism if they want to - e.g. they are free to choose `ServiceStack.Text`, `System.Xml.Serialization` or even some custom binary serializer.
 
@@ -317,18 +324,26 @@ To create our `Activity` - which will also be our Mvvm `View`:
 
 As a result this completed class is very simple:
 
-    [Activity(MainLauncher=true)]
-    public class TipCalcView : MvxActivity
-    {
-        public new TipViewModel ViewModel
-        {
-            get { return (TipViewModel)base.ViewModel; }
-            set { base.ViewModel = value; }
-        }
+    using Android.App;
+    using Cirrious.MvvmCross.Droid.Views;
+    using TipCalc.Core;
 
-        protected override void OnViewModelSet()
+    namespace TipCalc.UI.Droid.Views
+    {
+        [Activity(Label = "Tip", MainLauncher = true)]
+        public class TipView : MvxActivity
         {
-            SetContentView(Resource.Layout.Page_Tip);
+            public new TipViewModel ViewModel
+            {
+                get { return (TipViewModel) base.ViewModel; }
+                set { base.ViewModel = value; }
+            }
+
+            protected override void OnViewModelSet()
+            {
+                base.OnViewModelSet();
+                SetContentView(Resource.Layout.View_Tip);
+            }
         }
     }
 
