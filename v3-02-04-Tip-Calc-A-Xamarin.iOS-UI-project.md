@@ -315,7 +315,7 @@ Altogether this looks like:
 
 ### Binding in Xamarin.iOS
 
-You will no doubt have noticed that Binding in iOS looked different to the way it looked in Android - and to what you may have expected from XAML.
+You will no doubt have noticed that data-binding in iOS looks veru different to the way it looked in Android - and to what you may have expected from XAML.
 
 This is because the XIB format used in iOS is a lot less human manipulable and extensible than the XML formats used in Android AXML and Windows XAML - so it makes more sense to use C# rather than the XIB to register our bindings.
 
@@ -325,12 +325,16 @@ Within this section of the tutorial all of our iOS bindings look like:
 
 what this line means is:
 
-* bind the TipLabel's default binding property
-* to the ViewModel's Tip property
+* bind the `TipLabel`'s default binding property - which happens to be a property called `Text`
+* to the `ViewModel`'s Tip property
 
 As with Android, this will be a `TwoWay` binding by default - which is different to what XAML developers may expect to see.
 
-We'll cover other mechanisms for binding, including binding to non-default fields and using `ValueConverter`s in later topics.
+If you had wanted to specify the `TipLabel` property to use instead of relying on the default, then you could have done this with:
+
+		this.Bind (this.TipLabel, label => label.Text, (TipViewModel vm) => vm.Tip ); 
+
+In later topics we'll cover more on binding in iOS, including more on binding to non-default fields; other binding code mechanisms; and using `ValueConverter`s.
 
 ## The iOS UI is complete!
 
@@ -340,9 +344,9 @@ When it starts... you should see:
 
 ![v1](https://raw.github.com/slodge/MvvmCross/v3/v3Tutorial/Pictures/TipCalc_Touch_Sim.png)
 
-This seems to work perfectly, although you may notice that when you tap on the SubTotal and start editing the text, then there is no way later to close the keyboard.
+This seems to work perfectly, although you may notice that when you tap on the `SubTotal` property and start entering text, then there is no way later to close the keyboard.
 
-To work around this, you can add a gesture recognizer to the ViewDidLoad:
+To work around this, you can add a gesture recognizer to the `ViewDidLoad` method:
 
 	View.AddGestureRecognizer(new UITapGestureRecognizer(() => {
 		this.SubTotalTextField.ResignFirstResponder();
