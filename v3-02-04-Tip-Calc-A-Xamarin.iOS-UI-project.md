@@ -305,7 +305,6 @@ Altogether this looks like:
 			{
 				base.ViewDidLoad ();
 				
-				// Perform any additional setup after loading the view, typically from a nib.
 				this.Bind (this.TipLabel, (TipViewModel vm) => vm.Tip ); 
 				this.Bind (this.SubTotalTextField, (TipViewModel vm) => vm.SubTotal );
 				this.Bind (this.GenerositySlider, (TipViewModel vm) => vm.Generosity );
