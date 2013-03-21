@@ -305,9 +305,9 @@ Altogether this looks like:
 
 You will no doubt have noticed that Binding in iOS looked different to the way it looked in Android - and to what you may have expected from XAML.
 
-This is because the UI
+This is because the XIB format used in iOS is a lot less human manipulable and extensible than the XML formats used in Android AXML and Windows XAML - so it makes more sense to use C# rather than the XIB to register our bindings.
 
-Within this section of the tutorial all of our bindings look like:
+Within this section of the tutorial all of our iOS bindings look like:
 
 		this.Bind (this.TipLabel, (TipViewModel vm) => vm.Tip ); 
 
@@ -340,4 +340,4 @@ To work around this, you can add a gesture recognizer to the ViewDidLoad:
 
 There's more we could do to make this User Interface nicer and to make the app richer... but for this first application, we will leave it here for now.
 
-Let's move on to Xamarin.iOS and to Windows!
+Let's move on to Windows!
