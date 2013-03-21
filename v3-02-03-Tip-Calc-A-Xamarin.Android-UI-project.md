@@ -2,8 +2,7 @@ We started with the goal of creating an app to help calculate what tip to leave 
 
 We had a plan to produce a UI based on this concept:
 
-
-TODO - picture/sketch
+![Sketch](../v3/v3Tutorial/Pictures/TipCalc_Sketch.png)
 
 To satisfy this we built a 'Core' Portable Class Library project which contained:
 
@@ -65,12 +64,16 @@ Normally these will be found in a folder path like *{SolutionRoot}/Libs/Mvx/Droi
 Also, within that same folder you need to add:
 
 * **System.Windows.dll** - *Android version* 
-   - This adds some PCL adaptation - some 'type forwarding' allowing PCL libraries that need to access things like `System.Windows.ICommand` to work on Xamarin.Android
+   - This adds some core PCL adaptation - some 'type forwarding' allowing PCL libraries to access things like `System.Windows.ICommand` even though on Xamarin.Android there isn't really any `System.Windows`
 
 
 ### Add a reference to TipCalc.Core.csproj
 
-Add a reference to your `TipCalc.Core` project - the project we created in the last step which includes your `Calculation` service, your `TipViewModel` and your `App` application wiring.
+Add a reference to your `TipCalc.Core` project - the project we created in the last step which included:
+
+* your `Calculation` service, 
+* your `TipViewModel` 
+* your `App` wiring.
 
 
 ## Add the MvvmCross Android binding resource file
@@ -79,12 +82,14 @@ This file can be found in https://github.com/slodge/MvvmCross/tree/v3/Cirrious/C
 
 It needs to be copied to the `/Resources/Values` folder in your project.
 
-The contents of this file are very simple - they just declare some XML extensions to enable declarative data-binding:
+The contents of this file are very simple - but very technical. We'll return later to talk more about the nodes and attributes declared in this file, and about how they enable declarative data-binding. 
+
+For now, the only line we will use is the core data-binding attribute: `MvxBind` 
 
 	<?xml version="1.0" encoding="utf-8"?>
 	<resources>
 	  <declare-styleable name="MvxBinding">
-		<attr name="MvxBind" format="string"/>
+		**<attr name="MvxBind" format="string"/>**
 		<attr name="MvxLang" format="string"/>
 	  </declare-styleable>
 	  <declare-styleable name="MvxListView">
@@ -97,22 +102,21 @@ The contents of this file are very simple - they just declare some XML extension
 	  </declare-styleable>
 	</resources>
 
-We'll cover the nodes and attributes within this XML file more in later topics. For this topic the only one we will use is the core data-binding attribute: `MvxBind`
 
 ## Add a Setup class
 
 Every MvvmCross UI project requires a `Setup` class.
 
-This class sits in the root namespace (folder) of our UI project and performs the initialisation of the MvvmCross framework, including:
+This class sits in the root namespace (folder) of our UI project and performs the initialisation of the MvvmCross framework and your application, including:
 
   * the Inversion of Control (IoC) system
   * the MvvmCross data-binding
-  * your `App` and its collection of ViewModels
-  * your UI project and its collection of Views
+  * your `App` and its collection of `ViewModel`s
+  * your UI project and its collection of `View`s
 
 Most of this functionality is provided for you automatically. Within your Droid UI project all you have to supply are:
 
-- your `App` - your link to the business logic and ViewModel content
+- your `App` - your link to the business logic and `ViewModel` content
 - some initialisation for the Json.Net plugin and for the navigation mechanism
 
 For `TipCalc` here's all that is needed in Setup.cs:
@@ -137,7 +141,7 @@ For `TipCalc` here's all that is needed in Setup.cs:
         }
     }
 
-**Note:** You may wonder why the Json Navigation is initialized within your Setup code, while so much else initialization is done automatically for you. The reason behind this lies in the effort MvvmCross makes to minimize dependencies on external projects. By not including JSON.Net as a reference within MvvmCross, this enables the application developer to choose a completely different serialization mechanism if you want to - e.g. you are free to choose `ServiceStack.Text`, `System.Xml.Serialization` or even some custom binary serializer.
+**Note:** You may wonder why the Json Navigation is initialized within your `Setup` code, while so much else initialization is done automatically for you. The reason behind this lies in the effort MvvmCross makes to minimize dependencies on external projects. By not including JSON.Net as a reference within MvvmCross itself, this enables developers to later choose a completely different serialization mechanism if they want to - e.g. they are free to choose `ServiceStack.Text`, `System.Xml.Serialization` or even some custom binary serializer.
 
 ## Add your View
 
@@ -149,7 +153,9 @@ Instead all I'll say here is the bare minimum. If you are new to Android, then y
 
 To achieve the basic layout:
 
-- we'll add a new AXML file and we'll edit it using either the Xamarin Android designer or the Visual Studio XML editor - the designer gives us a visual display, while the VS editro *sometimes* gives us XML Intellisense.
+- we'll add a new AXML file - `View_Tip.axml` in the `/resources/Layout` folder
+
+- we'll edit this using either the Xamarin Android designer or the Visual Studio XML editor - the designer gives us a visual display, while the VS editor *sometimes* gives us XML Intellisense.
 
         <?xml version="1.0" encoding="utf-8"?>
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -168,9 +174,9 @@ To achieve the basic layout:
             android:layout_height="fill_parent">
         </LinearLayout>
 
-- notice that this 'layout' is already by default a vertical `LinearLayout` - for XAMLites, this is like a `StackPanel`
+- notice that this 'layout' is already by default a **vertical** `LinearLayout` - for XAMLites, this layout is just like a `StackPanel` except that it is **very important** to specify the **vertical** orientation
 
-- within this layout we'll add some `TextView`s to provide some static text labels - for XAMLites, these are "like `TextBlock`s
+- within this layout we'll add some `TextView`s to provide some static text labels - for XAMLites, these are like `TextBlock`s
 
         <TextView
             android:layout_width="fill_parent"
@@ -192,16 +198,16 @@ To achieve the basic layout:
             android:layout_height="1dp"
             android:background="#ffff00" />
 
-- we'll add some `View`s for data display and entry, and we'll databind these `View`s to properties in our `TipViewModel` 
+- we'll add some `View`s for data display and entry, and we'll **databind** these `View`s to properties in our `TipViewModel` 
 
-  - an `EditText` for text data entry of the SubTotal - for XAMLites, this is a `TextBox`
+  - an `EditText` for text data entry of the `SubTotal` - for XAMLites, this is a `TextBox`
 
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 local:MvxBind="Text SubTotal" />
 
-  - a `SeekBar` for touch/slide entry of the Generosity - for XAMLites, this is like a `ProgressBar`
+  - a `SeekBar` for touch/slide entry of the `Generosity` - for XAMLites, this is like a `ProgressBar`
 
             <SeekBar
                 android:layout_width="fill_parent"
@@ -209,7 +215,7 @@ To achieve the basic layout:
                 android:max="40"
                 local:MvxBind="Progress Generosity" />
 
- - we'll add a `TextView` to disply the Tip that results from the calculation:
+ - we'll add a `TextView` to display the `Tip` that results from the calculation:
 
             <TextView
                 android:layout_width="fill_parent"
@@ -261,27 +267,55 @@ Each of the data-binding blocks within our first sample looks similar:
 
     local:MvxBind="Text SubTotal"
 
-What this means is:
+What this line means is:
 
-* data-bind the property `Text` on the `View`
-* to the property `SubTotal` on the `DataContext` (which in this case will be a `TipViewModel`)
+* data-bind:
+  * the property `Text` on the `View`
+  * to the property `SubTotal` on the `DataContext` - which in this case will be a `TipViewModel`
+* so:
+  * whenever the `TipViewModel` calls `RaisePropertyChanged` on `SubTotal` then the `View` should update
+  * and whenever the user enters text into the `View` then the `SubTotal` value should be `set` on the `TipViewModel`
 
-In later topics, we'll return to show you many more options for data-binding, including `ValueConverter`s, but for now all our binding uses this simple `View_Property ViewModel_Property` syntax
+Note that this `TwoWay` binding is **different** to XAML where generally the default `BindingMode` is only `OneWay`.
+
+In later topics, we'll return to show you more options for data-binding, including how to use `ValueConverter`s, but for now all our binding uses this simple `ViewProperty ViewModelProperty` syntax.
 
 ### Add the View class
 
-Create a Views folder within your TipCalc.UI.Droid project
+With our AXML layout complete, we can now add the C# `Activity` which is used to display this content. For developers coming from XAML backgrounds, these `Activity` classes are roughly equivalent to `Page` objects in WindowsPhone on WindowsStore applications - they own the 'whole screen' and have a lifecycle which means that only one of them is shown at any one time.
 
-Within this folder create a new C# class - `TipView`
+To create our `Activity` - which will also be our Mvvm `View`:
 
-This class will:
+* Create a Views folder within your TipCalc.UI.Droid project
 
-- inherit from `MvxActivity`
-- be marked with the Xamarin.Android `Activity` attribute, marking it as the `MainLauncher` for the project
-- provide a `new ViewModel` Property to specify the type of ViewModel it expects - the `TipViewModel`
-- use `OnViewModelSet` to inflate its `ContentView` from the AXML - this will use a resource identifier generated by the Android and Xamarin tools. 
+* Within this folder create a new C# class - `TipView`
 
-As a result this class is very simple:
+* This class will:
+
+ * inherit from `MvxActivity`
+
+            public class TipCalcView : MvxActivity
+
+ * be marked with the Xamarin.Android `Activity` attribute, marking it as the `MainLauncher` for the project
+
+            [Activity(MainLauncher=true)]
+
+ * provide a `new ViewModel` Property to specify the type of ViewModel it expects - the `TipViewModel`
+
+            public new TipViewModel ViewModel
+            {
+                get { return (TipViewModel)base.ViewModel; }
+                set { base.ViewModel = value; }
+            }
+
+ * use `OnViewModelSet` to inflate its `ContentView` from the AXML - this will use a resource identifier generated by the Android and Xamarin tools. 
+
+            protected override void OnViewModelSet()
+            {
+                SetContentView(Resource.Layout.View_Tip);
+            }
+
+As a result this completed class is very simple:
 
     [Activity(MainLauncher=true)]
     public class TipCalcView : MvxActivity
@@ -304,6 +338,25 @@ At this point you should be able to run your application.
 
 When it starts... you should see:
 
+![v1](../v3/v3Tutorial/Pictures/TipCalc_Android.png)
 
+If you then want to make it 'more beautiful', then try adding a few attributes to some of your AXML - things like:
 
-There's obviously more you could do to make this User Interface nicer and to make the app richer... but for this first application, we will leave it here and move on to Xamarin.iOS and to Windows
+        android:background="#00007f"
+        android:textColor="#ffffff"
+        android:textSize="24dp"
+        android:layout_margin="30dp"
+        android:padding="20dp"
+        android:layout_marginTop="10dp"
+
+Within a very short time, you should hopefully be able to create something 'styled'...
+
+![v2](../v3/v3Tutorial/Pictures/TipCalc_AndroidStyled.png)
+
+... but actually making it look 'nice' might take some design skills!
+        
+## Moving on
+
+There's more we could do to make this User Interface nicer and to make the app richer... but for this first application, we will leave it here for now.
+
+Let's move on to Xamarin.iOS and to Windows!
