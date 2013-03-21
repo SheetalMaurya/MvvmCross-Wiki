@@ -11,9 +11,7 @@ To create the core, you can use the Visual Studio project template wizards, but 
 
 ## Create the new Portable Class Library
 
-Using Visual Studio, create your new PCL.
-
-TODO - PIC
+Using Visual Studio, create your new PCL using the File|New Project wizard.
 
 Call it something like TipCalc.Core.csproj
 
