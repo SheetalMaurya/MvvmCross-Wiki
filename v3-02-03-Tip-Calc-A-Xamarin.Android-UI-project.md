@@ -134,11 +134,112 @@ For `TipCalc` here's all that is needed in Setup.cs:
 
 This tutorial doesn't attempt to give an introduction to Android XML layout.
 
-Instead all I'll say here is the bear minimum. If you are new to Android, then you can find out more about Android XML from lots of places including the official documentation at: http://developer.android.com/guide/topics/ui/declaring-layout.html
+Instead all I'll say here is the bare minimum. If you are new to Android, then you can find out more about Android XML from lots of places including the official documentation at: http://developer.android.com/guide/topics/ui/declaring-layout.html. If you are coming from a XAML background - you are a *XAMLite* - then I'll include some simple XAML-AXML comparisons to help you out.
 
 To achieve the basic layout:
 
- TODO - START AGAIN HERE TOMORROW
+- we'll add a new AXML file and we'll edit it using the VisualStudio XML editor (it gives us Intellisense sometimes)
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+    </LinearLayout>
+
+- we'll add a local app namespace - for XAML
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:local="http://schemas.android.com/apk/res/TipCalc.UI.Droid"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+    </LinearLayout>
+
+- notice that this 'layout' is already by default a vertical `LinearLayout` - for XAMLites, this is like a `StackPanel`
+
+- within this layour we'll add some `TextView`s to provide some static text labels - for XAMLites, these are "like `TextBlock`s
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="SubTotal" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Generosity" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Tip to leave" />
+
+- we'll also add a short, wide `View` with a yellow background to provide a small amount of visual UI chrome:
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#ffff00" />
+
+- we'll add some `View`s for data display and entry, and we'll databind these `View`s to the properties in our `TipViewModel` 
+
+  - an `EditText` for text data entry of the SubTotal - for XAMLites, this is a "`TextBox`es
+
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            local:MvxBind="Text SubTotal" />
+
+  - a `SeekBar` for touch/slide entry of the generosity - for XAMLites, to fields in our `TipViewModel` - for XAMLites, these are "like `TextBox`es
+
+        <SeekBar
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:max="40"
+            local:MvxBind="Progress Generosity" />
+
+- we'll add a `TextView`s to provide some static text labels - for XAMLites, these are "like `TextBox`es
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:local="http://schemas.android.com/apk/res/TipCalc.UI.Droid"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="SubTotal" />
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            local:MvxBind="Text SubTotal" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Generosity" />
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            local:MvxBind="Text Generosity" />
+        <SeekBar
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:max="40"
+            local:MvxBind="Progress Generosity" />
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#ffff00" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Tip to leave" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            local:MvxBind="Text Tip" />
+    </LinearLayout>
 
 ### Add the View class
 
