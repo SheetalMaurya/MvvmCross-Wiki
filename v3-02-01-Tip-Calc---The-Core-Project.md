@@ -192,9 +192,9 @@ For many of you, this `TipViewModel` will already make sense to you. If it does 
             Tip = _calculation.TipAmount(SubTotal, Generosity);
         }
 
-## Add the Application
+## Add the App(lication)
 
-With our `Calculation` service and `TipViewModel` defined, we now just need to add the main `Application` code.
+With our `Calculation` service and `TipViewModel` defined, we now just need to add the main `App` code.
 
 This code:
 
@@ -203,8 +203,8 @@ This code:
 * this class is normally just called `App`
 * this class is responsible for providing:
   * registration of which interfaces and implementations the app uses
-  * registration of which ViewModel the app will show when it starts
-  * control of how ViewModels are located - although most applications normally just use the default implementation of this supplied by the base `MvxApplication` class.
+  * registration of which `ViewModel` the `App` will show when it starts
+  * control of how `ViewModel`s are located - although most applications normally just use the default implementation of this supplied by the base `MvxApplication` class.
 
 'Registration' here means creating an 'Inversion of Control' - IoC - record for an interface. This IoC record tells the MvvmCross framework what to do when anything asks for an instance of that interface.
 
@@ -234,11 +234,34 @@ So here's what App.cs looks like:
         {
             public App()
             {
-                Mvx.RegisterSingleton<ICalculation>(new Calculation());
+                Mvx.RegisterType<ICalculation,Calculation>();
                 Mvx.RegisterSingleton<IMvxAppStart>(new MvxAppStart<TipViewModel>());
             }
         }
     }
+
+## Note: What is 'Inversion of Control'?
+
+We won't go into depth here about what IoC - Inversion of Control - is.
+
+Instead, we will just say that:
+
+* within each MvvmCross application, there is a single special object - a `singleton`
+* This `singleton` lives within the `Mvx` static class.
+* The application startup code can use the `Mvx.Register` methods in order to specify what will implement `interface`s during the lifetime of the app.
+* After this has been done, then later in the life when any code needs an `interface` implementation, then it can request one using the `Mvx.Resolve` methods.
+
+One common pattern that is seen is 'constructor injection':
+
+* Our `TipViewModel` uses this pattern. 
+* It presents a constructor like: `public TipViewModel(ICalculation calculation)`. 
+* When the app is running a part of the MvvmCross framework called the `ViewModelLocator` is used to find and create `ViewModel`s
+* when a `TipViewModel` is needed, the `ViewModelLocator` uses a call to `Mvx.IocConstruct` to create one.
+* This `Mvx.IocConstruct` call creates the `TipViewModel` using the `ICalculation` implementation that it finds using `Mvx.Resolve`
+
+This is obviously only a very brief introduction.
+
+If you would like to know more, please see look up some of the excellent tutorials out there on the Internet - like http://joelabrahamsson.com/inversion-of-control-an-introduction-with-examples-in-net/
 
 ## The Core project is complete :)
 
@@ -262,3 +285,7 @@ Just to recap the steps we've followed:
   * registered a special start object for `IMvxAppStart`
 
 These are the same steps that you need to go through for every new MvvmCross application.
+
+## Moving on
+
+Next we'll start looking at how to add a first UI to this MvvmCross application.
