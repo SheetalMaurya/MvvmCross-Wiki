@@ -85,47 +85,54 @@ Within MvvmCross, all ViewModels should inherit from `MvxViewModel`.
 
 So now create a ViewModels folder in our project, and in this folder add a new `TipViewModel` class like:
 
-    public class TipViewModel : MvxViewModel
+    using Cirrious.MvvmCross.ViewModels;
+
+    namespace TipCalc.Core
     {
-        private readonly ICalculation _calculation;
-       
-        public TipViewModel(ICalculation calculation)
+        public class TipViewModel : MvxViewModel
         {
-            _calculation = calculation;
-        }
+            private readonly ICalculation _calculation;
+            public TipViewModel(ICalculation calculation)
+            {
+                _calculation = calculation;
+            }
 
-        public override void Start()
-        {
-            // set some start values
-            _subTotal = 100.0;
-            _generosity = 10;
-            Recalculate();
-        }
+            public override void Start()
+            {
+                _subTotal = 100;
+                _generosity = 10;
+                Recalcuate();
+                base.Start();
+            }
 
-        private double _subTotal;
-        public double SubTotal
-        {
-            get { return _subTotal; }
-            set {  _subTotal = value; RaisePropertyChanged(() => SubTotal); Recalculate(); }
-        }
+            private double _subTotal;
 
-        private int _generosity;
-        public int Generosity
-        {
-            get { return _generosity; }
-            set {  _generosity = value; RaisePropertyChanged(() => Generosity); Recalculate(); }
-        }
+            public double SubTotal
+            {
+                get { return _subTotal; }
+                set { _subTotal = value; RaisePropertyChanged(() => SubTotal); Recalcuate(); }
+            }
 
-        private double _tip;
-        public double Tip
-        {
-            get { return _tip; }
-            private set {  _tip = value; RaisePropertyChanged(() => Tip); }
-        }
-      
-        private void Recalculate()
-        {
-            Tip = _calculation.TipAmount(SubTotal, Generosity);
+            private int _generosity;
+
+            public int Generosity
+            {
+                get { return _generosity; }
+                set { _generosity = value; RaisePropertyChanged(() => Generosity); Recalcuate(); }
+            }
+
+            private double _tip;
+
+            public double Tip
+            {
+                get { return _tip; }
+                set { _tip = value; RaisePropertyChanged(() => Tip);}
+            }
+
+            private void Recalcuate()
+            {
+                Tip = _calculation.TipAmount(SubTotal, Generosity);
+            }
         }
     }
 
@@ -218,18 +225,20 @@ For our Tip Calculation app:
 
 So here's what App.cs looks like:
 
-     public class App : MvxApplication
-     {
-         public App ()
-         {
-             // register the interfaces/implementations this App will use
-             Mvx.RegisterSingleton<ICalculation>(new Calculation());
+    using Cirrious.CrossCore.IoC;
+    using Cirrious.MvvmCross.ViewModels;
 
-             // when the app starts, show the TipViewModel
-             var appStart = new MvxAppStart<TipViewModel>();
-             Mvx.RegisterSingleton<IMvxAppStart>(appStart);
-         }
-     }
+    namespace TipCalc.Core
+    {
+        public class App : MvxApplication
+        {
+            public App()
+            {
+                Mvx.RegisterSingleton<ICalculation>(new Calculation());
+                Mvx.RegisterSingleton<IMvxAppStart>(new MvxAppStart<TipViewModel>());
+            }
+        }
+    }
 
 ## The Core project is complete :)
 
