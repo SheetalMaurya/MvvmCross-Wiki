@@ -185,7 +185,7 @@ Together, this looks like:
 
 Create a Views folder
 
-Within this, add a new 'iPhone UIViewController' called `TipView`
+Within this, add a new 'iPhone UIViewController' and call it `TipView`
 
 This will generate:
 
@@ -203,35 +203,37 @@ Just as we did with Android, I won't go into depth here about how to use the XIB
 
 Drag/drop from the 'Object Library' to add:
 
-* some UILabels for showing static text - these are like `TextBlock`s
-* a UITextField for editing the SubTotal - this is like a `TextBox`
-* a UISlider for editing the Generosity - this is like a `ProgressBar`
-* a UILabel for showing the Tip result  - this is like a `TextBlock`
+* some `UILabel`s for showing static text - these are like `TextBlock`s
+* a `UITextField` for editing the `SubTotal` - this is like a `TextBox`
+* a `UISlider` for editing the `Generosity` - this is like a `ProgressBar`
+* a `UILabel` for showing the `Tip` result  - this is like a `TextBlock`
 
-Using drag and drop, uou should be able to quite quickly generate a design similar to:
+Using drag and drop, you should be able to quite quickly generate a design similar to:
 
 ![design](https://raw.github.com/slodge/MvvmCross/v3/v3Tutorial/Pictures/TipCalc_Touch_Design.png)
 
 ### Create 'outlets' within the XIB editor
 
-Once you have your UI drawn, you can then link those UI displayed fields to ObjectiveC variables called outlets. After you have done this, then the Xamarin tools will then map those ObjectiveC fields to C# properties back in your iOS app.
+Once you have your UI drawn, you can then link those UI displayed fields to ObjectiveC variables called `outlet`s.
 
-To start doing this, you need to open the 'Assistant Editor' from menu option 'View' -> 'Assistant Editor' -> 'Show Assistant Editor' within xCode.
+After you have done this, then the Xamarin.iOS tools within Xamarin Studio will then automaticallly detect these changes and map those ObjectiveC fields to C# properties back in your iOS app.
 
-Once you have done this, then you can ctrl-click (right click) on each of the 3 SubTotal, Generosity and Tip fields in turn. 
+To start doing this, you need to open the 'Assistant Editor' from menu option 'View' -> 'Assistant Editor' -> 'Show Assistant Editor' within xCode. This will display a small pane with some ObjectiveC code in it - this is the 'Assistant Editor'
+
+Once you have done this, then you can ctrl-click (right click) on each of the 3 `SubTotal`, `Generosity` and `Tip` fields in turn. 
 
 ![outlet](https://raw.github.com/slodge/MvvmCross/v3/v3Tutorial/Pictures/TipCalc_Touch_Outlet.png)
 
 For each of them:
 
-- ctrl-click the UI field
+- ctrl-click the UI field in the designer
 - this will 'pop up' a window listing the 'outlets and actions' available for this field
 - find the one marked 'New Referencing Outlet' 
 - click on the circle to the right of 'New Referencing Outlet' and drag that to the Assistant Editor.
-- drop the field on the assistant editor
-- it will then ask you to provide a name for your outlet option
+- drop the field on the Assistant Editor
+- it will then ask you to provide a name for your `outlet` option
 
-Following this process you should be able to create three ObjectiveC variables for the three fields:
+Following this process you should be able to create three ObjectiveC `outlet` variables for the three fields:
 
 * `SubTotalTextField`
 * `GenerositySlider`
@@ -248,9 +250,9 @@ Back in Xamarin Studio, you should now see that the Xamarin products have update
 * `GenerositySlider`
 * `TipLabel`
 
-Close the TipView.designer.cs file
+Close the TipView.designer.cs file - this file is an auto-generated `partial` class, and Xamarin Studio can regenerate it at any time - so there is no point in editing it yourself.
 
-Open TipView.cs
+Instead open TipView.cs - this contains an editable part of the same `partial` class
 
 Because we want our `TipView` to be not only a `UIViewController` but also an Mvvm `View`, then change the inheritance of `TipView` so that it inherits from `MvxViewController`
 
@@ -264,7 +266,9 @@ Now, to link `TipView` to `TipViewModel` create a `public new TipViewModel ViewM
         set { base.ViewModel = value; }
     }
 
-To add the data-binding code, go to the `ViewDidLoad` method in your TipView and add some binding methods:
+To add the data-binding code, go to the `ViewDidLoad` method in your `TipView` class. This is a method that will be called after the View is loaded within iOS but before it is displayed on the screen.
+
+This makes `ViewDidLoad` a perfect place for us to call some data-binding extension methods which will specify how we want the UI data-bound to the ViewModel:
 
 	public override void ViewDidLoad ()
 	{
@@ -275,7 +279,9 @@ To add the data-binding code, go to the `ViewDidLoad` method in your TipView and
 		this.Bind (this.GenerositySlider, (TipViewModel vm) => vm.Generosity );
 	}
    
-What this code does is to generate 'in code' the same type of binding information as we generated 'in XML' in Android.
+What this code does is to generate 'in code' exactly the same type of data-binding information as we generated 'in XML' in Android.
+
+**Note** that before the calls to `this.Bind` are made, then we first call `base.ViewDidLoad()`. This is important because `base.ViewDidLoad()` is where MvvmCross locates the `TipViewModel` that this `TipView` will bind to.
 
 Altogether this looks like:
 
@@ -333,7 +339,7 @@ If you had wanted to specify the `TipLabel` property to use instead of relying o
 
 		this.Bind (this.TipLabel, label => label.Text, (TipViewModel vm) => vm.Tip ); 
 
-In later topics we'll cover more on binding in iOS, including more on binding to non-default fields; other binding code mechanisms; and using `ValueConverter`s.
+In later topics we'll cover more on binding in iOS, including more on binding to non-default fields; other code-based binding code mechanisms; custom bindings; using `ValueConverter`s; and creating bound sub-views.
 
 ## The iOS UI is complete!
 
@@ -343,9 +349,9 @@ When it starts... you should see:
 
 ![v1](https://raw.github.com/slodge/MvvmCross/v3/v3Tutorial/Pictures/TipCalc_Touch_Sim.png)
 
-This seems to work perfectly, although you may notice that when you tap on the `SubTotal` property and start entering text, then there is no way later to close the keyboard.
+This seems to work perfectly, although you may notice that if you tap on the `SubTotal` property and start entering text, then you cannot afterwards close the keyboard.
 
-To work around this, you can add a gesture recognizer to the `ViewDidLoad` method:
+This is a View concern - it is a UI problem. So we can fix it just in the iOS UI code - in this View. For example, to fix this here, you can add a gesture recognizer to the end of the `ViewDidLoad` method like:
 
 	View.AddGestureRecognizer(new UITapGestureRecognizer(() => {
 		this.SubTotalTextField.ResignFirstResponder();
