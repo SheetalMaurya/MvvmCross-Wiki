@@ -314,7 +314,7 @@ Altogether this looks like:
 
 ### Binding in Xamarin.iOS
 
-You will no doubt have noticed that data-binding in iOS looks veru different to the way it looked in Android - and to what you may have expected from XAML.
+You will no doubt have noticed that data-binding in iOS looks very different to the way it looked in Android - and to what you may have expected from XAML.
 
 This is because the XIB format used in iOS is a lot less human manipulable and extensible than the XML formats used in Android AXML and Windows XAML - so it makes more sense to use C# rather than the XIB to register our bindings.
 
