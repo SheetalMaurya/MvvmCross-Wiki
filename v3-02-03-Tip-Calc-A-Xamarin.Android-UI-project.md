@@ -31,6 +31,8 @@ Within this, you'll find the normal Android application constructs:
 
 No-one really needs an `Activity1` :)
 
+Also, delete `Main.axml` in the /resources/Layout folder.
+
 ## Add references
 
 ### Add references to CoreCross, Binding and MvvmCross - PCL versions
@@ -60,9 +62,16 @@ Each of these extends the functionality of its PCL counterpart with Android spec
 
 Normally these will be found in a folder path like *{SolutionRoot}/Libs/Mvx/Droid/*
 
+Also, within that same folder you need to add:
+
+* **System.Windows.dll** - *Android version* 
+   - This adds some PCL adaptation - some 'type forwarding' allowing PCL libraries that need to access things like `System.Windows.ICommand` to work on Xamarin.Android
+
+
 ### Add a reference to TipCalc.Core.csproj
 
 Add a reference to your `TipCalc.Core` project - the project we created in the last step which includes your `Calculation` service, your `TipViewModel` and your `App` application wiring.
+
 
 ## Add the MvvmCross Android binding resource file
 
@@ -87,6 +96,8 @@ The contents of this file are very simple - they just declare some XML extension
 		<attr name="MvxSource" format="string"/>
 	  </declare-styleable>
 	</resources>
+
+We'll cover the nodes and attributes within this XML file more in later topics. For this topic the only one we will use is the core data-binding attribute: `MvxBind`
 
 ## Add a Setup class
 
@@ -130,7 +141,7 @@ For `TipCalc` here's all that is needed in Setup.cs:
 
 ## Add your View
 
-### Add the AXML
+### Add the Android Layout XML (AXML)
 
 This tutorial doesn't attempt to give an introduction to Android XML layout.
 
@@ -138,7 +149,7 @@ Instead all I'll say here is the bare minimum. If you are new to Android, then y
 
 To achieve the basic layout:
 
-- we'll add a new AXML file and we'll edit it using the VisualStudio XML editor (it gives us Intellisense sometimes)
+- we'll add a new AXML file and we'll edit it using either the Xamarin Android designer or the Visual Studio XML editor - the designer gives us a visual display, while the VS editro *sometimes* gives us XML Intellisense.
 
     <?xml version="1.0" encoding="utf-8"?>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -147,7 +158,7 @@ To achieve the basic layout:
         android:layout_height="fill_parent">
     </LinearLayout>
 
-- we'll add a local app namespace - for XAML
+- we'll add a local app namespace - **http://schemas.android.com/apk/res/TipCalc.UI.Droid** - this is just like adding a namespace in XAML.
 
     <?xml version="1.0" encoding="utf-8"?>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -159,7 +170,7 @@ To achieve the basic layout:
 
 - notice that this 'layout' is already by default a vertical `LinearLayout` - for XAMLites, this is like a `StackPanel`
 
-- within this layour we'll add some `TextView`s to provide some static text labels - for XAMLites, these are "like `TextBlock`s
+- within this layout we'll add some `TextView`s to provide some static text labels - for XAMLites, these are "like `TextBlock`s
 
         <TextView
             android:layout_width="fill_parent"
@@ -174,23 +185,23 @@ To achieve the basic layout:
             android:layout_height="wrap_content"
             android:text="Tip to leave" />
 
-- we'll also add a short, wide `View` with a yellow background to provide a small amount of visual UI chrome:
+- we'll also add a short, wide `View` with a yellow background to provide a small amount of chrome:
 
         <View
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:background="#ffff00" />
 
-- we'll add some `View`s for data display and entry, and we'll databind these `View`s to the properties in our `TipViewModel` 
+- we'll add some `View`s for data display and entry, and we'll databind these `View`s to properties in our `TipViewModel` 
 
-  - an `EditText` for text data entry of the SubTotal - for XAMLites, this is a "`TextBox`es
+  - an `EditText` for text data entry of the SubTotal - for XAMLites, this is a `TextBox`
 
         <EditText
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             local:MvxBind="Text SubTotal" />
 
-  - a `SeekBar` for touch/slide entry of the generosity - for XAMLites, to fields in our `TipViewModel` - for XAMLites, these are "like `TextBox`es
+  - a `SeekBar` for touch/slide entry of the Generosity - for XAMLites, this is like a `ProgressBar`
 
         <SeekBar
             android:layout_width="fill_parent"
@@ -198,7 +209,14 @@ To achieve the basic layout:
             android:max="40"
             local:MvxBind="Progress Generosity" />
 
-- we'll add a `TextView`s to provide some static text labels - for XAMLites, these are "like `TextBox`es
+- we'll add a `TextView` to disply the Tip that results from the calculation:
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            local:MvxBind="Text Tip" />
+
+Put together, this looks like:
 
     <?xml version="1.0" encoding="utf-8"?>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -218,10 +236,6 @@ To achieve the basic layout:
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="Generosity" />
-        <EditText
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            local:MvxBind="Text Generosity" />
         <SeekBar
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -241,22 +255,35 @@ To achieve the basic layout:
             local:MvxBind="Text Tip" />
     </LinearLayout>
 
+### About the data-binding syntax 
+
+Each of the data-binding blocks within our first sample looks similar:
+
+    local:MvxBind="Text SubTotal"
+
+What this means is:
+
+* data-bind the property `Text` on the `View`
+* to the property `SubTotal` on the `DataContext` (which in this case will be a `TipViewModel`)
+
+In later topics, we'll return to show you many more options for data-binding, including `ValueConverter`s, but for now all our binding uses this simple `View_Property ViewModel_Property` syntax
+
 ### Add the View class
 
 Create a Views folder within your TipCalc.UI.Droid project
 
 Within this folder create a new C# class - `TipView`
 
-This class must:
+This class will:
 
-- inherit from MvxActivity
-- be marked with the Xamarin.Android `ActivityAttribute`
-- override the base class ViewModel implementation to specify the type of ViewModel it expects
-- inflate its ContentView from the AXML - using a resource identifier generated by the Android and Xamarin tools. 
+- inherit from `MvxActivity`
+- be marked with the Xamarin.Android `Activity` attribute, marking it as the `MainLauncher` for the project
+- provide a `new ViewModel` Property to specify the type of ViewModel it expects - the `TipViewModel`
+- use `OnViewModelSet` to inflate its `ContentView` from the AXML - this will use a resource identifier generated by the Android and Xamarin tools. 
 
 As a result this class is very simple:
 
-    [Activity(Label = "Tip Calc")]
+    [Activity(MainLauncher=true)]
     public class TipCalcView : MvxActivity
     {
         public new TipViewModel ViewModel
@@ -271,14 +298,12 @@ As a result this class is very simple:
         }
     }
 
-## The Android UI is complete
+## The Android UI is complete!
 
 At this point you should be able to run your application.
 
-When it starts... TODO
+When it starts... you should see:
 
-TODO Notes:
 
-* Adding a splashscreen
-* changing to a slider
-* 
+
+There's obviously more you could do to make this User Interface nicer and to make the app richer... but for this first application, we will leave it here and move on to Xamarin.iOS and to Windows
