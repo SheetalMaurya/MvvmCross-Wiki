@@ -1,5 +1,3 @@
-TODO - work in progress!
-
 We started with the goal of creating an app to help calculate what tip to leave in a restaurant
 
 We had a plan to produce a UI based on this concept:
@@ -28,16 +26,16 @@ Obviously, to work with WindowsPhone, we will need to switch back to working on 
 
 ## Create a new WindowsPhone Project
 
-Add a new project to your solution - a 'WindowsPhone' application with name `TipCalc.UI.WP`
+Add a new project to your solution - a 'Windows Phone App' application with name `TipCalc.UI.WP`
+
+For target operating system, you can choose 7.1 or 8.0 - your choice.
 
 Within this, you'll find the normal WP application constructs:
 
-TODO
-* the Resources folder
-* the info.plist 'configuration' information
-* the AppDelegate.cs class
-* the Main.cs class
-* the MyViewController.cs class
+* the App.Xaml 'application' object
+* the 'Properties' folder with its AppManifest.xml and WMAppManifest.xml 'configuration' files
+* the MainPage.Xaml and MainPage.Xaml.cs files that define the default Page for this app
+* some icons
 
 ## Delete MainPage.xaml
 
@@ -93,35 +91,36 @@ This class sits in the root namespace (folder) of our UI project and performs th
 Most of this functionality is provided for you automatically. Within your WindowsPhone UI project all you have to supply are:
 
 - your `App` - your link to the business logic and `ViewModel` content
-- some initialisation for the Json.Net plugin and for the navigation mechanism
+- some initialisation 
+  - for the Json.Net plugin 
+  - for the navigation mechanism
 
 For `TipCalc` here's all that is needed in Setup.cs:
 
-    using System;
-    using TipCalc.Core;
-    using Cirrious.MvvmCross.Touch.Views.Presenters;
+    using Cirrious.MvvmCross.ViewModels;
+    using Microsoft.Phone.Controls;
     using Cirrious.MvvmCross.WindowsPhone.Platform;
-    
-    namespace TipCalc.UI.WindowsPhone
+
+    namespace TipCalc.UI.WP
     {
-	    public class Setup : MvxPhoneSetup
-	    {
-		    public Setup(PhoneApplicationFrame rootFrame)
-                       : base(rootFrame)
-		    {
-			    return new App();
-		    }
-
-		    protected override Cirrious.MvvmCross.ViewModels.IMvxApplication CreateApp ()
-		    {
-			    return new App();
-		    }
-
-        protected override void InitializeDefaultTextSerializer()
+        public class Setup : MvxPhoneSetup
         {
-            Cirrious.MvvmCross.Plugins.Json.PluginLoader.Instance.EnsureLoaded(true);
+            public Setup(PhoneApplicationFrame rootFrame)
+                : base(rootFrame)
+            {
+            }
+
+            protected override IMvxApplication CreateApp()
+            {
+                return new Core.App();
+            }
+
+            protected override IMvxNavigationSerializer CreateNavigationSerializer()
+            {
+                Cirrious.MvvmCross.Plugins.Json.PluginLoader.Instance.EnsureLoaded(true);
+                return new MvxJsonNavigationSerializer();
+            }
         }
-	    }
     }
 
 ## Modify the App.xaml.cs to use Setup
@@ -159,177 +158,154 @@ To modify this `App.xaml.cs` for MvvmCross, we need to:
 
 After you've done this your code might look like:
 
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Net;
-	using System.Windows;
-	using System.Windows.Controls;
-	using System.Windows.Documents;
-	using System.Windows.Input;
-	using System.Windows.Media;
-	using System.Windows.Media.Animation;
-	using System.Windows.Navigation;
-	using System.Windows.Shapes;
-	using Cirrious.CrossCore.IoC;
-	using Cirrious.MvvmCross.ViewModels;
-	using Microsoft.Phone.Controls;
-	using Microsoft.Phone.Shell;
+    using System.Windows;
+    using System.Windows.Navigation;
+    using Cirrious.CrossCore.IoC;
+    using Cirrious.MvvmCross.ViewModels;
+    using Microsoft.Phone.Controls;
+    using Microsoft.Phone.Shell;
 
-	using BestSellers;
+    namespace TipCalc.UI.WP
+    {
+        public partial class App : Application
+        {
+            /// <summary>
+            /// Provides easy access to the root frame of the Phone Application.
+            /// </summary>
+            /// <returns>The root frame of the Phone Application.</returns>
+            public PhoneApplicationFrame RootFrame { get; private set; }
 
-	namespace BestSellers.WindowsPhone
-	{
-		public partial class App 
-			: Application
-				
-		{
-			/// <summary>
-			/// Provides easy access to the root frame of the Phone Application.
-			/// </summary>
-			/// <returns>The root frame of the Phone Application.</returns>
-			public PhoneApplicationFrame RootFrame { get; private set; }
-			
-			/// <summary>
-			/// Constructor for the Application object.
-			/// </summary>
-			public App()
-			{
-				System.Diagnostics.Debug.WriteLine("Application Constructor");
-				
-				// Global handler for uncaught exceptions. 
-				UnhandledException += Application_UnhandledException;
-				
-				// Standard Silverlight initialization
-				InitializeComponent();
-				
-				// Phone-specific initialization
-				InitializePhoneApplication();
-				
-				// Show graphics profiling information while debugging.
-				if (System.Diagnostics.Debugger.IsAttached)
-				{
-					// Display the current frame rate counters.
-					Application.Current.Host.Settings.EnableFrameRateCounter = true;
-					
-					// Show the areas of the app that are being redrawn in each frame.
-					//Application.Current.Host.Settings.EnableRedrawRegions = true;
-					
-					// Enable non-production analysis visualization mode, 
-					// which shows areas of a page that are handed off to GPU with a colored overlay.
-					//Application.Current.Host.Settings.EnableCacheVisualization = true;
-					
-					// Disable the application idle detection by setting the UserIdleDetectionMode property of the
-					// application's PhoneApplicationService object to Disabled.
-					// Caution:- Use this under debug mode only. Application that disables user idle detection will continue to run
-					// and consume battery power when the user is not using the phone.
-					PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
-				}
-				
-				var setup = new Setup(RootFrame);
-				setup.Initialize();
-			}
-			
-			private bool _hasDoneFirstNavigation = false;
-			
-			// Code to execute when the application is launching (eg, from Start)
-			// This code will not execute when the application is reactivated
-			private void Application_Launching(object sender, LaunchingEventArgs e)
-			{
-				System.Diagnostics.Debug.WriteLine("Application_Launching");
-				
-				RootFrame.Navigating += (navigatingSender, navigatingArgs) =>
-				{
-					if (_hasDoneFirstNavigation)
-						return;
-					
-					navigatingArgs.Cancel = true;
-					_hasDoneFirstNavigation = true;
-					var applicationStart = Mvx.Resolve<IMvxAppStart>();
-					RootFrame.Dispatcher.BeginInvoke(() => applicationStart.Start());
-				};
-			}
-			
-			// Code to execute when the application is activated (brought to foreground)
-			// This code will not execute when the application is first launched
-			private void Application_Activated(object sender, ActivatedEventArgs e)
-			{
-				System.Diagnostics.Debug.WriteLine("Application_Activated");
-			}
-			
-			// Code to execute when the application is deactivated (sent to background)
-			// This code will not execute when the application is closing
-			private void Application_Deactivated(object sender, DeactivatedEventArgs e)
-			{
-				System.Diagnostics.Debug.WriteLine("Application_Deactivated");
-			}
-			
-			// Code to execute when the application is closing (eg, user hit Back)
-			// This code will not execute when the application is deactivated
-			private void Application_Closing(object sender, ClosingEventArgs e)
-			{
-				System.Diagnostics.Debug.WriteLine("Application_Closing");
-			}
-			
-			// Code to execute if a navigation fails
-			private void RootFrame_NavigationFailed(object sender, NavigationFailedEventArgs e)
-			{
-				if (System.Diagnostics.Debugger.IsAttached)
-				{
-					// A navigation has failed; break into the debugger
-					System.Diagnostics.Debugger.Break();
-				}
-			}
-			
-			// Code to execute on Unhandled Exceptions
-			private void Application_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
-			{
-				if (System.Diagnostics.Debugger.IsAttached)
-				{
-					// An unhandled exception has occurred; break into the debugger
-					System.Diagnostics.Debugger.Break();
-				}
-			}
-			
-			#region Phone application initialization
-			
-			// Avoid double-initialization
-			private bool phoneApplicationInitialized = false;
-			
-			// Do not add any additional code to this method
-			private void InitializePhoneApplication()
-			{
-				if (phoneApplicationInitialized)
-					return;
-				
-				// Create the frame but don't set it as RootVisual yet; this allows the splash
-				// screen to remain active until the application is ready to render.
-				RootFrame = new PhoneApplicationFrame();
-				RootFrame.Navigated += CompleteInitializePhoneApplication;
-				
-				// Handle navigation failures
-				RootFrame.NavigationFailed += RootFrame_NavigationFailed;
-				
-				// Ensure we don't initialize again
-				phoneApplicationInitialized = true;
-			}
-			
-			// Do not add any additional code to this method
-			private void CompleteInitializePhoneApplication(object sender, NavigationEventArgs e)
-			{
-				// Set the root visual to allow the application to render
-				if (RootVisual != RootFrame)
-					RootVisual = RootFrame;
-				
-				// Remove this handler since it is no longer needed
-				RootFrame.Navigated -= CompleteInitializePhoneApplication;
-				
-				System.Diagnostics.Debug.WriteLine("CompleteInitializePhoneApplication");
-			}
-			
-			#endregion
-		}
-	}
+            /// <summary>
+            /// Constructor for the Application object.
+            /// </summary>
+            public App()
+            {
+                // Global handler for uncaught exceptions. 
+                UnhandledException += Application_UnhandledException;
 
+                // Standard Silverlight initialization
+                InitializeComponent();
+
+                // Phone-specific initialization
+                InitializePhoneApplication();
+
+                // Show graphics profiling information while debugging.
+                if (System.Diagnostics.Debugger.IsAttached)
+                {
+                    // Display the current frame rate counters.
+                    Application.Current.Host.Settings.EnableFrameRateCounter = true;
+
+                    // Show the areas of the app that are being redrawn in each frame.
+                    //Application.Current.Host.Settings.EnableRedrawRegions = true;
+
+                    // Enable non-production analysis visualization mode, 
+                    // which shows areas of a page that are handed off to GPU with a colored overlay.
+                    //Application.Current.Host.Settings.EnableCacheVisualization = true;
+
+                    // Disable the application idle detection by setting the UserIdleDetectionMode property of the
+                    // application's PhoneApplicationService object to Disabled.
+                    // Caution:- Use this under debug mode only. Application that disables user idle detection will continue to run
+                    // and consume battery power when the user is not using the phone.
+                    PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
+                }
+
+                var setup = new Setup(RootFrame);
+                setup.Initialize();
+            }
+
+            private bool _hasDoneFirstNavigation = false;
+
+            // Code to execute when the application is launching (eg, from Start)
+            // This code will not execute when the application is reactivated
+            private void Application_Launching(object sender, LaunchingEventArgs e)
+            {
+                RootFrame.Navigating += (navigatingSender, navigatingArgs) =>
+                {
+                    if (_hasDoneFirstNavigation)
+                        return;
+
+                    navigatingArgs.Cancel = true;
+                    _hasDoneFirstNavigation = true;
+                    var appStart = Mvx.Resolve<IMvxAppStart>();
+                    RootFrame.Dispatcher.BeginInvoke(() => appStart.Start());
+                };
+            }
+
+            // Code to execute when the application is activated (brought to foreground)
+            // This code will not execute when the application is first launched
+            private void Application_Activated(object sender, ActivatedEventArgs e)
+            {
+            }
+
+            // Code to execute when the application is deactivated (sent to background)
+            // This code will not execute when the application is closing
+            private void Application_Deactivated(object sender, DeactivatedEventArgs e)
+            {
+            }
+
+            // Code to execute when the application is closing (eg, user hit Back)
+            // This code will not execute when the application is deactivated
+            private void Application_Closing(object sender, ClosingEventArgs e)
+            {
+            }
+
+            // Code to execute if a navigation fails
+            private void RootFrame_NavigationFailed(object sender, NavigationFailedEventArgs e)
+            {
+                if (System.Diagnostics.Debugger.IsAttached)
+                {
+                    // A navigation has failed; break into the debugger
+                    System.Diagnostics.Debugger.Break();
+                }
+            }
+
+            // Code to execute on Unhandled Exceptions
+            private void Application_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
+            {
+                if (System.Diagnostics.Debugger.IsAttached)
+                {
+                    // An unhandled exception has occurred; break into the debugger
+                    System.Diagnostics.Debugger.Break();
+                }
+            }
+
+            #region Phone application initialization
+
+            // Avoid double-initialization
+            private bool phoneApplicationInitialized = false;
+
+            // Do not add any additional code to this method
+            private void InitializePhoneApplication()
+            {
+                if (phoneApplicationInitialized)
+                    return;
+
+                // Create the frame but don't set it as RootVisual yet; this allows the splash
+                // screen to remain active until the application is ready to render.
+                RootFrame = new PhoneApplicationFrame();
+                RootFrame.Navigated += CompleteInitializePhoneApplication;
+
+                // Handle navigation failures
+                RootFrame.NavigationFailed += RootFrame_NavigationFailed;
+
+                // Ensure we don't initialize again
+                phoneApplicationInitialized = true;
+            }
+
+            // Do not add any additional code to this method
+            private void CompleteInitializePhoneApplication(object sender, NavigationEventArgs e)
+            {
+                // Set the root visual to allow the application to render
+                if (RootVisual != RootFrame)
+                    RootVisual = RootFrame;
+
+                // Remove this handler since it is no longer needed
+                RootFrame.Navigated -= CompleteInitializePhoneApplication;
+            }
+
+            #endregion
+        }
+    }
 
 ## Add your View
 
@@ -337,14 +313,53 @@ After you've done this your code might look like:
 
 Create a Views folder
 
-It is **important** on WindowsPhone
+It is **important** on WindowsPhone, that this folder is called `Views` - the MvvmCross framework looks for this name by default on WindowsPhone.
 
-Within this, add a new 'Windows Phone Page' and call it `TipView`
+Within this folder, add a new 'Windows Phone Portrait Page' and call it `TipView.xaml`
 
 This will generate:
 
 * TipView.xaml
-* TipView.cs
+* TipView.xaml.cs
+
+### Turn TipView into the MvvmCross View for TipViewModel
+
+Open the TipView.cs file.
+
+To change TipView from a `PhonePage` into an MvvmCross view, change it so that it inherits from `MvxPhonePage`
+
+    public partial class TipView : MvxPhonePage
+
+To link `TipView` to `TipViewModel` create a `public new TipViewModel ViewModel` property - exactly as you did in Xamarin.Android and Xamarin.iOS:
+
+    public new TipViewModel ViewModel
+    {
+        get { return (TipViewModel) base.ViewModel; }
+        set { base.ViewModel = value; }
+    }
+
+
+Altogether this looks like:
+
+    using Cirrious.MvvmCross.WindowsPhone.Views;
+    using TipCalc.Core.ViewModels;
+
+    namespace TipCalc.UI.WP.Views
+    {
+        public partial class TipView : MvxPhonePage
+        {
+            public new TipViewModel ViewModel
+            {
+                get { return (TipViewModel) base.ViewModel; }
+                set { base.ViewModel = value; }
+            }
+
+            public TipView()
+            {
+                InitializeComponent();
+            }
+        }
+    }
 
 ### Edit the XAML layout
 
@@ -354,15 +369,31 @@ This will open the XAML editor within Visual Studio.
 
 I won't go into much depth at all here about how to use the XAML or do the Windows data-binding. I'm assuming most readers are already coming from at least a little XAML background.
 
-To add the XAML here, simply edit the `ContentPanel` to include:
+To make the XAML inheritance match the `MvxPhonePage` inheritance, change the outer root node of the Xaml file from:
 
-* a `StackPanel` container
-* some `TextBlock` static text
-* a bound `TextBox` for the `SubTotal`
-* a bound `Slider` for the `Generosity`
-* a bound `TextBlock` for the `Tip`
+    <phone:PhoneApplicationPage 
+        ... >
+        <!-- content -->
+    </phone:PhoneApplicationPage>
 
-        <!--ContentPanel - place additional content here-->
+to:
+
+    <views:MvxPhonePage
+        xmlns:views="clr-namespace:Cirrious.MvvmCross.WindowsPhone.Views;assembly=Cirrious.MvvmCross.WindowsPhone"
+        ... >
+        <!-- content -->
+    </views:MvxPhonePage>
+
+To then add the XAML user interface for our tip calculator, we wi;l edit the `ContentPanel` to include:
+
+* a `StackPanel` container, into which we add:
+  * some `TextBlock` static text
+  * a bound `TextBox` for the `SubTotal`
+  * a bound `Slider` for the `Generosity`
+  * a bound `TextBlock` for the `Tip`
+
+This will produce XAML like:
+
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
             <StackPanel>
                 <TextBlock
@@ -370,7 +401,7 @@ To add the XAML here, simply edit the `ContentPanel` to include:
                     Style="{StaticResource PhoneTextSubtleStyle}"
                     />
                 <TextBox 
-                    Text="{Binding SubTotal, Converter={StaticResource FloatValueConverter}, Mode=TwoWay}" 
+                    Text="{Binding SubTotal, Mode=TwoWay}" 
                     />
 
                 <TextBlock
@@ -393,86 +424,29 @@ To add the XAML here, simply edit the `ContentPanel` to include:
                     />
             </StackPanel>
         </Grid>
-    </Grid>
 
-**Note** that in XAML, `OneWay` binding is generally the default. So that is why `TwoWay` is explicitly stated in `Value="{Binding Generosity,Mode=TwoWay}"`
+**Note** that in XAML, `OneWay` binding is generally the default. To provide TwoWay binding we explicitly add `Mode` to our binding expressions: e.g. `Value="{Binding Generosity,Mode=TwoWay}"`
 
-### Link the TipView to the TipViewModel
+In the designer, this will look like:
 
-Open the TipView.cs file.
+![Designer](https://raw.github.com/slodge/MvvmCross/v3/v3Tutorial/Pictures/TipCalc_WP_Designer.png)
 
-To link `TipView` to `TipViewModel` create a `public new TipViewModel ViewModel` property - exactly as you did in Xamarin.Android and Xamarin.iOS:
-
-    public new TipViewModel ViewModel
-    {
-        get { return (TipViewModel) base.ViewModel; }
-        set { base.ViewModel = value; }
-    }
-
-
-Altogether this looks like:
-
-        using Cirrious.MvvmCross.WindowsPhone.Views;
-	using TipView.Core;
-
-	namespace TipView.UI.WP
-	{
-	    public partial class TipView : MvxPhonePage
-	    {
-	        public new TipViewModel ViewModel
-	        {
-	            get { return (TipViewModel)base.ViewModel; }
-	            set { base.ViewModel = value; }
-	        }
-
-	        public TipView()
-	        {
-	            InitializeComponent();
-	        }
-	    }
-	}
-
-### Binding in Xamarin.iOS
-
-You will no doubt have noticed that data-binding in iOS looks very different to the way it looked in Android - and to what you may have expected from XAML.
-
-This is because the XIB format used in iOS is a lot less human manipulable and extensible than the XML formats used in Android AXML and Windows XAML - so it makes more sense to use C# rather than the XIB to register our bindings.
-
-Within this section of the tutorial all of our iOS bindings look like:
-
-		this.Bind (this.TipLabel, (TipViewModel vm) => vm.Tip ); 
-
-what this line means is:
-
-* bind the `TipLabel`'s default binding property - which happens to be a property called `Text`
-* to the `ViewModel`'s Tip property
-
-As with Android, this will be a `TwoWay` binding by default - which is different to what XAML developers may expect to see.
-
-If you had wanted to specify the `TipLabel` property to use instead of relying on the default, then you could have done this with:
-
-		this.Bind (this.TipLabel, label => label.Text, (TipViewModel vm) => vm.Tip ); 
-
-In later topics we'll cover more on binding in iOS, including more on binding to non-default fields; other code-based binding code mechanisms; custom bindings; using `ValueConverter`s; and creating bound sub-views.
-
-## The iOS UI is complete!
+## The WP UI is complete!
 
 At this point you should be able to run your application.
 
 When it starts... you should see:
 
-![v1](https://raw.github.com/slodge/MvvmCross/v3/v3Tutorial/Pictures/TipCalc_Touch_Sim.png)
+![v1](https://raw.github.com/slodge/MvvmCross/v3/v3Tutorial/Pictures/TipCalc_WP_Emu.png)
 
-This seems to work perfectly, although you may notice that if you tap on the `SubTotal` property and start entering text, then you cannot afterwards close the keyboard.
+This seems to work perfectly, although you may notice that if you edit the value in the `SubTotal` TextBox then you rest of the display does not correctly update.
 
-This is a View concern - it is a UI problem. So we can fix it just in the iOS UI code - in this View. For example, to fix this here, you can add a gesture recognizer to the end of the `ViewDidLoad` method like:
+This is a View concern - it is a UI problem. So we can fix it just in the WindowsPhone UI code - in this View. For example, to fix this here, you can add the 'Coding4Fun' toolkit from Nuget and then use their `UpdateSourceOnChange` attached property to resolve the issue
 
-	View.AddGestureRecognizer(new UITapGestureRecognizer(() => {
-		this.SubTotalTextField.ResignFirstResponder();
-	}));
+     coding4fun:TextBinding.UpdateSourceOnChange="True"
         
 ## Moving on...
 
 There's more we could do to make this User Interface nicer and to make the app richer... but for this first application, we will leave it here for now.
 
-Let's move on to Windows!
+Let's move on to even more Windows!
