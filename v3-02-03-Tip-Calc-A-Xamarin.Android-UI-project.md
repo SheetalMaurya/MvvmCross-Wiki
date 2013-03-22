@@ -41,9 +41,9 @@ Add references to the new project for the portable libraries:
 * **Cirrious.CrossCore.dll** 
    - core interfaces and concepts including Trace, IoC and Plugin management
 * **Cirrious.MvvmCross.Binding.dll** 
-   - DataBinding classes - which you'll mainly use from 
+   - DataBinding classes - which you'll mainly use from XML
 * **Cirrious.MvvmCross.dll** 
-   - Mvvm classes - including base classes for your MvxActivity views
+   - Mvvm classes - including base classes for your views and viewmodels
 * **Cirrious.MvvmCross.Plugins.Json.dll** 
    - Adds a PCL Newtonsoft.JSON.Net implementation - our Android UI application will use this to navigate between Activities (pages)
 
