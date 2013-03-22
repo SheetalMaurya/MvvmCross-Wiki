@@ -47,9 +47,9 @@ Add references to the new project for the portable libraries:
 * **Cirrious.CrossCore.dll** 
    - core interfaces and concepts including Trace, IoC and Plugin management
 * **Cirrious.MvvmCross.Binding.dll** 
-   - DataBinding classes - which you'll mainly use from 
+   - DataBinding classes - which you'll mainly use from C# code
 * **Cirrious.MvvmCross.dll** 
-   - Mvvm classes - including base classes for your MvxActivity views
+   - Mvvm classes - including base classes for your views and viewmodels
 
 Normally these will be found in a folder path like *{SolutionRoot}/Libs/Mvx/Portable/*
 
