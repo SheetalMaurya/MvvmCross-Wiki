@@ -151,8 +151,8 @@ To modify this `App.xaml.cs` for MvvmCross, we need to:
 
                 navigatingArgs.Cancel = true;
                 _hasDoneFirstNavigation = true;
-                var appStart = this.GetService<IMvxAppStart>();
-                RootFrame.Dispatcher.BeginInvoke(appStart.Start);
+                var appStart = Mvx.Resolve<IMvxAppStart>();
+                RootFrame.Dispatcher.BeginInvoke(() => appStart.Start());
             };
         }
 
