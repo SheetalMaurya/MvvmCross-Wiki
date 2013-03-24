@@ -198,9 +198,89 @@ When this application runs, you should see a simple UI for `FirstView` with a `F
 
 ##Navigation with parameters - using a parameter object
 
+As you write apps, you may frequently find that you want to parameterize a `ViewModel` navigation.
+
+For example, you may encounter List-Detail situations - where:
+
+- The Master view shows a list of items. 
+- When the user selects one of these, then the app will navigate to a Detail view 
+- The Detail view will then shows that specific selected item.
+
+To achieve this, the navigation from `MasterViewModel` to `DetailViewModel` will normally be achieved by:
+
+- we declare a class `DetailParameters` for the navigation:
+
+        public class DetailParameters
+        {
+            public int Index { get; set; }
+        }
+
+- the `MasterViewModel` makes `ShowViewModel` a call like:
+
+        ShowViewModel<DetailViewModel>(new DetailParameters() { Index = 2 });
+
+- the `DetailViewModel` declares an `Init` method in order to receive this `DetailParameters`:
+
+        public void Init(DetailParameters parameters)
+        {
+            // use the parameters here
+        }
+
+**Note** that the `DetailParameters` class used here must be a 'simple' class used only for these navigations:
+
+- it must contain a parameterless constructor 
+- it should contain only public properties with both `get` and `set` access
+- these properties should be only of types: 
+  - `int`
+  - `long`
+  - `double`
+  - `string`
+  - `Guid`
+  - enumeration values
+
+The reason for this limitations are that the navigation object itself needs to be serialized - it needs to be passed through mechanisms like Xaml urls on WindowsPhone, and like Intent parameter bundles on Android.
+
+If you do ever want to pass more complex objects between ViewModels during navigation, then you will need to find an alternative mechanism - e.g. perhaps caching the object in SQLite and using an index to identify the object.
+
+##In action - an iOS example
+
 TODO
 
 ##Navigation with parameters - using an anonymous parameter object
+
+For simple navigations, declaring a formal `Parameters` object can feel like 'overkill' - like 'hard work'.
+
+In these situations you can instead use anonymous classes and named method arguments.
+
+For example, you can:
+
+- use a call to `ShowViewModel` like:
+
+        ShowViewModel<DetailViewModel>(new { index = 2 });
+
+- in the `DetailViewModel` declare an `Init` method in order to receive this `index` as:
+
+        public void Init(int index)
+        {
+            // use the index here
+        }
+
+**Note** that due to serialization requirements, the only available parameter types used within this technique are only:
+
+  - `int`
+  - `long`
+  - `double`
+  - `string`
+  - `Guid`
+  - enumeration values
+
+**Note** that in order to use this technique on Windows platforms, you will need to add a `InternalsVisibleTo` line within the `AssemblyInfo.cs` file for the Core project.
+
+    [assembly: InternalsVisibleTo("Cirrious.MvvmCross")]
+
+This is because anonymous classes within C# are `internal` by default - so Cirrious.MvvmCross can only use reflection on them if `InternalsVisibleTo` is specified.
+
+##In action - a WindowsPhone example
 
 TODO
 
@@ -214,7 +294,11 @@ TODO
 
 ##What if I don't want 'Pages'?
 
+TODO
+
 ###Tabs
 ###Navigation within Tabs
 ###Modal Windows
 ###Dialogs
+
+TODO
