@@ -1,4 +1,5 @@
 Just a placeholder while I work out what the docs team are doing in the main repo. Will move there soon...
+
 ##DataBinding
 
 DataBinding is the key technology that Mvvm relies on to link Views with their ViewModels.
@@ -805,7 +806,13 @@ To add these properties to your Windows Phone, Store or WPF MvvmCross app:
 - include the BindingEx package
 - include an additional step in Setup which initialises the WindowsBinding framework
 
-      TODO
+        protected override void InitializeLastChance()
+        {
+            base.InitializeLastChance();
+            
+            var builder = new MvxWindowsBindingBuilder();
+            builder.DoRegistration();        
+        }
 
 - in your Xaml files include an xml attribute for `mvx` - this will be different according to the platform:
 
@@ -840,5 +847,3 @@ The framework that enables the Rio and Tibet binding extensions is interface-bas
 We're excited by the possibilities that this framework can provide - by the inventions that the community can now develop.
 
 Anyone wishing to experiment with creating their own source binding plugins is encouraged to get started by looking at the source code for the MethodBinding and FieldBinding plugins.
-
-
