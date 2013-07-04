@@ -1,5 +1,4 @@
 Just a placeholder while I work out what the docs team are doing in the main repo. Will move there soon...
-
 ##DataBinding
 
 DataBinding is the key technology that Mvvm relies on to link Views with their ViewModels.
@@ -53,6 +52,8 @@ In the View:
      - custom C# methods have to be used to get and set the variable values
      - custom Java listeners or Objective-C delegates have to be used to detect when the UI View state changes (e.g. when the user enters text or taps on a button).
 
+For more info on the details on implementing custom bindings, see **TODO - N+1 maybe?**
+
 ### DataBound properties
 
 Using the View and ViewModel properties described above, it's common for a ViewModel C# property to be used to  model the value of a View property.
@@ -74,6 +75,16 @@ For example:
         }
 
 - then a binding might connect together `IsChecked` on the View with `RememberMe` in the ViewModel.
+
+### DataBound events and actions
+
+Databinding also enables a ViewModel to react to 'events' which occur in a View - e.g. for a ViewModel to respond to events such as a button being pressed.
+
+The technique generally used for this is for the ViewModel to expose special `Command` properties which can be bound to corresponding `Command` properties on the View.
+
+For example, a `CheckBox` might have a `CheckedCommand` and this might be bindable to a `RememberMeChangedCommand` on the ViewModel.
+
+Within Windows, For sometimes, when a View has not exposed
 
 ### Binding Modes 
 
@@ -344,6 +355,14 @@ Beyond this basic `$TargetPath$` to `$SourcePath$` syntax:
   
 - Where multiple bindings are needed, these can be separated using a semi-colon
 
+- One very specific extension to 'Swiss' binding is the `CommandParameter` binding, this binding uses an implicit ValueConverter to specify the parameter for an `ICommand` invocation. This is specified using:
+
+       , CommandParameter=$CPValue$
+       
+  where `$CPValue$` is a literal value similar to `$ParameterValue$` above
+
+
+
 Some examples of Swiss binding statements are:
 
 ---
@@ -376,7 +395,11 @@ Bind the `Text` property to `Order.Amount` on the ViewModel, but apply the `Trim
   
 Bind the `Value` property to `Count` on the ViewModel, and ensure this binding is both from View to ViewModel and from ViewModel to View.
  
- 
+---
+
+    Click DayCommand, CommandParameter='Thursday'
+
+Bind the `Click` event to the `DayCommand` property on the ViewModel (which should implement `ICommand`). When invoked, ensure that Execute is passeda parameter value of "Thursday"
 
 ###Fluent
 
@@ -522,13 +545,16 @@ There are a small number of ValueCombiners provided within Tibet, including:
 - `Add(one,two)` - takes 2 arguments which it 'combines' together. For two strings, this means concatenation. For two doubles or two longs it means numeric addition. For mixtures of those items, the result is currently not fully specified.
 - `GreaterThan(one, two)` - takes 2 arguments and attempts to apply greater than logic to them. As with `Add` this logic is straight-forward for two strings, two doubles or two longs, but is not well-defined for other object combinations.
 
-Note:
+Notes:
 
 - some ValueCombiners are also available in `operator` form - e.g. `Add` can be used as `+` and `GreaterThan` can be used as `>`
 - combination is an interpretation, not a compilation step - especially because dynamic code generation is not supported on all MvvmCross platforms.
 - for direct comparison/combination of simple `string`, `long` and `double` values, this 'interpretation' should work well. Using combiners for more complicated combinations is less well defined.
+- currenly ValueCombiners typically try to use `long` rather than `int` and `double` rather than `float`.
 
-**literal-binding**
+**Important note:** The current interface of value combiners is currently a proposal and working prototype only. As we learn more about the real use, benefits and challenges of value combination we may revise the API, including making breaking changes to any value combiners produced by the community. In particular, it's possible we may make changes to the type safety of the APIs, and we may try to reduce the complexity of the APIs - as Value Combiners are currently quite 'open' in the source/target types they accept and this makes developing them quite complicated.
+
+**Literal binding**
 
 As we've seen in the previous Multi-Binding and Value-Combining steps, literals can now be included in Tibet binding expressions.
 
@@ -544,9 +570,17 @@ Or a binding:
     
 uses a literal string to assist formating `TheDate` and `Name`
 
-**binding macros**
+**Binding macros**
 
-binding macros are not yet implemented.
+Binding macros are not yet implemented.
+
+Ideas being considered in this area include:
+
+- access to `parent`, `global` and `named(name)` binding contexts
+- access to shared variables - e.g, shared numbers, strings and Colors which could provide more theming/styling options
+- access to i18n resources to make text localisation more straight-forward
+
+It is likely that that prefix characters, such as `$`, `#` or `@`, might be used as simple markers to enable the identification of these 'macros'
 
 **Functional syntax for ValueConverters and ValueCombiners**
 
@@ -566,15 +600,245 @@ Note that the function name space is shared between the Value Combiners and the 
      
 **Nested value conversion**
 
-The interpretation
+In addition to supporting multiple bound source values, Tibet binding further introduces nested evaluation of value converters and combiners.
 
-#TODO
-New bindings:
-- Rio binding
-- Auto-Command binding
+For example, Length and Trim value converters could be applied with the Add value combiner as:
 
-Also:
-- Events and ICommands.. and behaviours - oh my!
+       Text Length(Trim(FirstName + ' ' + LastName))
 
-Also:
-- Using MvvmCross bindings in Windows
+**A Mild Warning** 
+
+Tibet binding provides developers with many options for more advanced bindings.
+
+This advancement is, of course, not free - it does come with a small memory and processing cost during both the construction and the exceution of the bindings.
+
+In general, this additional overhead is very small and so should not be of concern to developers. However, it's always important to be aware of your application's performance - so always consider how a binding will be constructed and evaluated, especially when applying large numbers of bindings, when applying bindings within loops (collections) or when applying bindings to data which changes very frequently. Always consider applying source (ViewModel-based) data manipulation, writing a single optimised combiner/converter or consider simple `OneTime` binding as potential ways to avoid performance issues.
+
+###Rio
+
+Within ViewModels, Mvvm in C# has always been centred around the `INotifyPropertyChanged` interface.
+
+This interface is typically implemented around C# properties which look like:
+ 
+        private string _lastName;
+        public string LastName
+        {
+           get { return _lastName; }
+           set 
+           { 
+              _lastName = value;
+              RaisePropertyChanged(() => LastName);
+           }
+        }
+
+and this is further enhanced using `ICommand` properties for action callbacks - e.g.
+
+    private ICommand _submitCommand;
+    public ICommand SubmitCommand
+    {
+        get
+        {
+             _submitCommand = _submitCommand ?? new MvxCommand(DoSubmit);
+             return _submitCommand;
+        }
+    }
+
+This syntax is well understood by experienced Mvvm developers, but can also appear quite verbose when dealing with very small view models.
+
+Some developers have worked around this verbosity by using techniques such as post-compilation injectio of code - e.g. using the AOP Property plugin from Fody.
+
+Rio binding offers developers a different approach - using the new FieldBinding and MethodBinding plugins.
+
+**FieldBinding**
+
+With the field binding plugin, MvvmCross databinding can use ViewModel public fields as data-sources for binding - e.g.
+
+     public string LastName;
+     
+Further, to provide events to drive UI updates, a lightweight `INotifyChanged` interface has been added, along with abbreviated helper interfaces and classes - `INC<T>` and `NC<T>`. These can be used as:
+
+     public readonly INC<string> LastName = new NC<string>();
+
+A `LastName` declared in this way can be databound exactly as te earlier `INotifyPropertyChanged`-based property:
+
+    Text LastName
+
+Further, the underlying `string` field can be accessed in code using:
+
+    LastName.Value = "Hello";
+    Mvx.Trace("Current value is {0}", LastName.Value);
+
+To use FieldBinding, import the Field binding plugin into both your `core` and your UI projects.
+
+**Notes:** 
+
+- In addition to the syntatic changes of Rio, there are also some slight performance improvements - achieved by avoiding some Reflection-based get/set and by avoiding string-based event notifications.
+- `INotifyChanged` binding has no way to support the `INotifyPropertyChanged` feature 'all changed' which is achieved by signalling a property change with a null or empty property name.
+- `INotifyChanged` itself is a very simple interface - so you can easily implement your own classes to implement this if you require extensions.
+
+ 
+**MethodBinding**
+
+With the method binding plugin, MvvmCross databinding can use ViewModel public methods as sources for `ICommand` without declaring an `ICommand` property.
+
+For example, a method
+
+    public void GoHome()
+    {
+    	ShowViewModel<HomeViewModel>();
+    }
+    
+can be used in binding as:
+
+    Click GoHome 
+
+Where a single argument is available within the source method, Method Binding uses the command parameter for this call. This is useful in, for example, list item selection events - e.g.:
+
+    public void ShowDetail(ListItem item)
+    {
+    	ShowViewModel<DetailViewModel>(new { id = item.Id} );
+    }
+    
+bound with:
+
+    ItemClick ShowDetail 
+
+To use MethodBinding, import the Method binding plugin into just your UI projects - there is no 'core' component required for these plugins.
+
+**Note:** One important feature sometimes used in Windows Xaml binding but poorly supported by MvvmCross is the `CanExecute`/`CanExecuteChanged` functionality on `ICommand`. In Xaml binding this property and event pair can be used to enable/disable UI controls such as buttons.
+
+However, in MvvmCross, this auto-enable/disable binding isn't currently widely supported - with support instead being given to secondary binding properties - e.g. to pairs of bindings like:
+
+    Click GoHome; IsEnabled CanGoHome
+
+**The Rio Effect**
+
+A view model built using Rio will **not** be to every developer's liking.
+
+However, the effect on the code-size and readability can be striking.
+     
+A Rio `INotifyChanged` ViewModel like:
+
+     public class MathsViewModel
+     {
+     	public readonly INC<double> SubTotal = new NC<double>();
+     	public readonly INC<double> Percent = new NC<double>();
+        
+        public void Calculate()
+        {
+            Total.Value = SubTotal.Value * Percent.Value;
+        }    
+         
+     	public readonly INC<double> Total = new NC<double>();         
+     }
+     
+is equivalent to a `INotifyPropertyChanged` ViewModel of:
+     
+     public class MathsViewModel
+     {
+     	private double _subTotal;
+        public double SubTotal
+        {
+           get { return _subTotal; }
+           set
+           {
+           	  _subTotal = value;
+           	  RaisePropertyChanged(() => SubTotal);
+           }
+        } 
+        
+     	private double _precent;
+        public double Percent
+        {
+           get { return _percent; }
+           set
+           {
+           	  _percent = value;
+           	  RaisePropertyChanged(() => Percent);
+           }
+        }
+        
+        private ICommand _calculateCommand;
+        public ICommand CalculateCommand;
+        {
+           get 
+           {
+              _calculateCommand = _calculateCommand ?? new MvxCommand(Calculate);
+              return _calculateCommand;
+           }
+        }
+        
+        private void Calculate()
+        {
+            Total = SubTotal * Percent;
+        }    
+         
+     	private double _total;
+        public double Total
+        {
+           get { return _total; }
+           set
+           {
+           	  _total = value;
+           	  RaisePropertyChanged(() => Total);
+           }
+        }         
+     }
+     
+**BindingEx - Tibet and Rio in Xaml**
+
+Xaml is a platform and product from Microsoft which offers excellent tooling, lots of extensibility for adding new controls, but only limited extensibility for adding customisation.
+
+Unfortunately, this means MvvmCross can't intercept the 'normal' Xaml binding syntax which might look like:
+
+     Text="{Binding FirstName}"
+     
+However, MvvmCross Swiss, Tibet and Rio binding can be enabled through `AttachedProperties` 
+
+In particular two `AttachedProperties` is supplied in the BindingEx package:
+
+- `mvx:Bi.nd` - for bindings
+- `mvx:La.ng` - for internationalisation extensions
+
+To add these properties to your Windows Phone, Store or WPF MvvmCross app:
+
+- include the BindingEx package
+- include an additional step in Setup which initialises the WindowsBinding framework
+
+      TODO
+
+- in your Xaml files include an xml attribute for `mvx` - this will be different according to the platform:
+
+ - phone
+ 
+       xmlns:mvx="clr-namespace:mvx;assembly=Cirrous.MvvmCross.BindingEx.WindowsPhone"
+ 
+ - store
+ 
+       xmlns:mvx="using:mvx"
+        
+ - WPF
+
+       xmlns:mvx="clr-namespace:mvx;assembly=Cirrous.MvvmCross.BindingEx.Wpf"
+
+
+- in your Xaml files you can now include bindings within tags such as:
+
+       <TextBlock
+           mvx:Bi.nd="Text Customer.FirstName; Visible=ShowFirstName" />
+
+
+- for design-time support, you may also need to pull in additional value converters into the Xaml namespace. More information on this is available in **TODO-NOT-YET-WRITTEN-ALSO-CONSIDER-RUNTIME-VALUE-CONVERTER-LOADING-TOO**.
+
+Once installed, the syntax within these `AttachedProperties` bindings is exactly the same as within all other Swiss and Tibet binding - and this binding functionality can be extended with custom bindings, with FieldBinding, etc - just as in MvvmCross on non-Xaml platforms.
+
+
+
+###Beyond Rio
+The framework that enables the Rio and Tibet binding extensions is interface-based and is built upon the small `CrossCore` platform which underpins `MvvmCross`.
+
+We're excited by the possibilities that this framework can provide - by the inventions that the community can now develop.
+
+Anyone wishing to experiment with creating their own source binding plugins is encouraged to get started by looking at the source code for the MethodBinding and FieldBinding plugins.
+
+
