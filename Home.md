@@ -11,6 +11,11 @@ For more information please also see:
 - the N+1 video series under production - https://www.youtube.com/playlist?list=PLR6WI6W1JdeYSXLbm58jwAKYT7RQR31-W
 - Questions and answers on StackOverflow - http://stackoverflow.com/questions/tagged/mvvmcross
 
+Samples:
+
+- https://github.com/slodge/MvvmCross-Tutorials/
+- https://github.com/slodge/NPlus1DaysOfMvvmCross/
+
 If you would like to help with documentation, then please get in touch :)
 
 Videos:
