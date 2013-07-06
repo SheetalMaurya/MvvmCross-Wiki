@@ -1,6 +1,3 @@
-
-#Customisation opportunities
-
 In each deployed MvvmCross application there are two key classes which control how your app starts:
 
 - the `App` class in the core project - which provides the initialization for your core business logic and your viewmodels.
