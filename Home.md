@@ -16,8 +16,6 @@ Samples:
 - https://github.com/slodge/MvvmCross-Tutorials/
 - https://github.com/slodge/NPlus1DaysOfMvvmCross/
 
-If you would like to help with documentation, then please get in touch :)
-
 Videos:
 
 *   **[N Plus 1 Videos Of MvvmCross](/slodge/MvvmCross/wiki/N-1-Videos-Of-MvvmCross)**
@@ -48,3 +46,6 @@ The Tip Calc tutorial:
   *   **[v3 02 06 Tip Calc Windows Store Project](/slodge/MvvmCross/wiki/v3-02-06-Tip-Calc-Windows-Store-Project)**
   *   **[v3 02 07 Tip Calculator A Wpf UI Project](/slodge/MvvmCross/wiki/v3-02-07-Tip-Calculator-A-Wpf-UI-Project)**
   *   **[v3 02 10 Tip Calculator   A recap](/slodge/MvvmCross/wiki/v3-02-10-Tip-Calculator---A-recap)**
+
+
+If you would like to help with documentation, then please get in touch :)
