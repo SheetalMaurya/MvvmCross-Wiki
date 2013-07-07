@@ -1,3 +1,5 @@
+#ViewModel Creation
+
 In MvvmCross v3 - Hot Tuna - the default ViewModel location and construction was overhauled in order to provide 3 new features:
 
 - constructor based Dependency Injection
@@ -331,3 +333,15 @@ and
 ##Overriding CIRS.
 
 If you don't like this `CIRS` (Construction-Init-ReloadState-Start) flow for building your ViewModels, then the good news is that you can easily override the `ViewModelLocator` within v3, just as you could within earlier MvvmCross versions. For more on this see LINK-TODO
+
+#ViewModel Deactivation, Activation and Destruction
+
+Monitoring other View/ViewModel lifecycle event across multiple platforms is fairly tricky, especially once developers start experimenting beyond the 'basic' presentation models and start using tabs, splitviews, popups, flyouts, etc
+
+For most viewmodels, it's common to not try to monitor other lifecyle events. This is OK since most viewmodels don't perform any actions and don't consume any resources when the view is not present - so these can just be left to be garbage collected when the system needs the memory back.
+
+For ViewModels which consume low-intensity resources - like timer ticks - then these can generally use the `MvxMessenger` to connect the ViewModel to those resources. This messenger uses **weak referencing** by default and itself sends out subscription change messages when clients subscribe/unsubscribe. Using this method, a developer can allow the background resources to monitor whether the viewmodels are in memory (and referenced by views) - and so the background resources can manage themselves.
+   
+For those rare situations where resource monitoring is actively needed - e.g. for the `SpheroViewModel` which needs to maintain an active BlueTooth SPP channel - then it is possible to implement a custom interface on the ViewModel - e.g. `IActiveViewModel` - and this interface can be called from each of the views on each of the client platforms.
+
+Generally this involves being hooked up from ViewDidAppear/Disappear on iOS, OnNavigatedTo/From on Windows, and OnRestart/Pause on Android, although this may vary depending on the exact presentation of your views (eg whether they are whole pages, tabs, flyouts, etc).
