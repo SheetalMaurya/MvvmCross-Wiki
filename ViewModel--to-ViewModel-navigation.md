@@ -1,4 +1,3 @@
-
 This article will cover some of the techniques available within MvvmCross v3 for navigating between Page-level `ViewModel`s.
 
 ##What do we mean by 'Page'?
@@ -7,7 +6,7 @@ MvvmCross was born for making modern Mobile apps - for building apps for iPhone,
 
 These apps are generally 'Page'-based - that is they generally involve User-Interfaces which show a single 'Page' at a time and which often involve the user experience moving 'forwards' and 'backwards' through the application workflow.
 
-There are variations on this, especially for `Tab`bed or `Pivot`ing user interfaces; for `Dialog`s; and for `Split` displays. For using these alternatives, see http://slodge.blogspot.co.uk/2013/06/presenter-roundup.html.
+There are variations on this, especially for `Tab`bed or `Pivot`ing user interfaces; for `Modal` views; for `Hamburger` menus, for `Dialog`s; and for `Split` displays. For using these alternatives, see http://slodge.blogspot.co.uk/2013/06/presenter-roundup.html.
 
 ##The initial navigation
 
@@ -239,10 +238,6 @@ The reason for this limitations are that the navigation object itself needs to b
 
 If you do ever want to pass more complex objects between ViewModels during navigation, then you will need to find an alternative mechanism - e.g. perhaps caching the object in SQLite and using an index to identify the object.
 
-##In action - an iOS example
-
-TODO
-
 ##Navigation with parameters - using an anonymous parameter object
 
 For simple navigations, declaring a formal `Parameters` object can feel like 'overkill' - like 'hard work'.
@@ -277,22 +272,61 @@ For example, you can:
 
 This is because anonymous classes within C# are `internal` by default - so Cirrious.MvvmCross can only use reflection on them if `InternalsVisibleTo` is specified.
 
-##In action - a WindowsPhone example
+##In action - Android, Windows and iOS example
 
-TODO
+See: https://github.com/slodge/MvvmCross-Tutorials/tree/master/Navigation
+
+See: http://slodge.blogspot.co.uk/2013/04/n5-some-first-icommands-and-multiple.html
 
 ##How to move 'back'?
 
-TODO
+If you are using the 'default' presenters on each platform, then you can close the current 'top' ViewModel inside an `ICommand` like:
+
+       	public ICommand BackCommand
+       	{
+                get
+                {
+	                    return new MvxRelayCommand(() => Close(this);
+                }
+       	}
+
+This `Close` call creates an instance of `ClosePresentationHint` and passes it to the presenter as a call to `ChangePresentation(MvxPresentationHint hint)`
+
+The default presenters on each platform know how to handle this `ClosePresentationHint` if the requested ViewModel is the ViewModel for the current 'top' View.
+
+For example, on iOS the default presenter calls:
+
+            _masterNavigationController.PopViewControllerAnimated(true);
+
+If you have written a custom presenter - e.g. one which uses tabs, pivots, flyouts, etc - or if you want to close a different viewmodel (not the top-most one) then you will need to write the custom presentation logic yourself within your custom presenter.
 
 ###How do I remove `View`s and `ViewModel`s from the back stack?
 
-TODO
+There is no cross-platform way to clear items from the back stack using the default presenters.
+
+However, you can easily create your own presentation hint - e.g.
+
+     public class ClearHistoryPresentationHint : MvxPresentationHint 
+     {
+     }
+
+You can then send this from a ViewModel as, for example:
+
+       	public ICommand ClearHistoryCommand
+       	{
+                get
+                {
+	                    return new MvxRelayCommand(() => ChangePresentation(new ClearHistoryPresentationHint());
+                }
+       	}
+
+Then within your custom presenters (on each platform) you need to handle this change presentation request.
+
+- On the Windows you can generally do this using repeated calls to the `ClearBackStep()` API
+- On iOS you can access and manipulate the `ViewControllers[]` array on a `UINavigationController`
+- On Android.... you may struggle more - you may find it harder to implement this type of functionality. for some background on this, see questions and answers like http://stackoverflow.com/questions/3007998/on-logout-clear-activity-history-stack-preventing-back-button-from-opening-l
 
 ##What if I don't want 'Pages'?
 
-TODO - see Presenter
-###Modal Windows
-###Dialogs
+There are variations on this, especially for `Tab`bed or `Pivot`ing user interfaces; for `Modal` views; for `Hamburger` menus, for `Dialog`s; and for `Split` displays. For using these alternatives, see http://slodge.blogspot.co.uk/2013/06/presenter-roundup.html.
 
-TODO
