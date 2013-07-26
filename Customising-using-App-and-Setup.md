@@ -97,7 +97,7 @@ There are three key methods where application specific initialisation might be a
 2 `Setup.InitializeFirstChance` - a "first blood" placeholder for any steps you want to take before any of the later steps happen
 3 `Setup.InitializeLastChance` - a "last ditch" placeholder for any steps you want to take after all of earlier steps have happened. Note that Android and iOS base classes
 
-In this section, we'll only introduce some of the possibilities for creating and registering objects during initialize and setup. For a more in-depth introduction to MvvmCross IoC, see LINK-TODO.
+In this section, we'll only introduce some of the possibilities for creating and registering objects during initialize and setup. For a more in-depth introduction to MvvmCross IoC, see [Service Location and Inversion of Control](https://github.com/slodge/MvvmCross/wiki/Service-Location-and-Inversion-of-Control).
 
 ###Registering cross-platform business objects in `App.Initialize`
 
@@ -119,7 +119,7 @@ This logic says:
  - that no instance will be created until one is requested
  - that once the first instance has been created, then that same instance will be returned for all subsequent requests
 
-Many other registration techniques are available - including registering objects from other assemblies, using instance-per-request registration and using individual rather than reflection-based registrations. For more on these, see LINK-TO-IOC-DOC-TODO.
+Many other registration techniques are available - including registering objects from other assemblies, using instance-per-request registration and using individual rather than reflection-based registrations. For more on these, see [Service Location and Inversion of Control](https://github.com/slodge/MvvmCross/wiki/Service-Location-and-Inversion-of-Control).
 
 ###Registering platform-specific business objects in `Setup.InitializeFirstChance` and `Setup.InitializeLastChance`
 
