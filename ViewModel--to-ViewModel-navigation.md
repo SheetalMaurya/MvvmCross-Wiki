@@ -1,5 +1,4 @@
 
-
 This article will cover some of the techniques available within MvvmCross v3 for navigating between Page-level `ViewModel`s.
 
 ##What do we mean by 'Page'?
@@ -8,7 +7,7 @@ MvvmCross was born for making modern Mobile apps - for building apps for iPhone,
 
 These apps are generally 'Page'-based - that is they generally involve User-Interfaces which show a single 'Page' at a time and which often involve the user experience moving 'forwards' and 'backwards' through the application workflow.
 
-There are variations on this, especially for `Tab`bed or `Pivot`ing user interfaces; for `Dialog`s; and for `Split` displays. For using these alternatives, see TODO-SETUP-LINK-TO-PRESENTERS.
+There are variations on this, especially for `Tab`bed or `Pivot`ing user interfaces; for `Dialog`s; and for `Split` displays. For using these alternatives, see http://slodge.blogspot.co.uk/2013/06/presenter-roundup.html.
 
 ##The initial navigation
 
