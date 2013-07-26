@@ -8,13 +8,14 @@ For more information please also see:
 
 - Stuart's blog - http://slodge.blogspot.com
 - an introduction article on CodeProject - http://www.codeproject.com/KB/cross-platform/566191.aspx
-- the N+1 video series under production - https://www.youtube.com/playlist?list=PLR6WI6W1JdeYSXLbm58jwAKYT7RQR31-W
+- the N+1 video series under production - [N Plus 1 Videos Of MvvmCross](/slodge/MvvmCross/wiki/N-1-Videos-Of-MvvmCross)
 - Questions and answers on StackOverflow - http://stackoverflow.com/questions/tagged/mvvmcross
 
 Samples:
 
-- https://github.com/slodge/MvvmCross-Tutorials/
-- https://github.com/slodge/NPlus1DaysOfMvvmCross/
+- https://github.com/slodge/MvvmCross/wiki/MvvmCross-Tutorials
+ - https://github.com/slodge/MvvmCross-Tutorials/
+ - https://github.com/slodge/NPlus1DaysOfMvvmCross/
 
 Videos:
 
