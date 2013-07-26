@@ -1,7 +1,3 @@
-Welcome to the MvvmCross wiki!
-
-## MvvmCross v3 - Hot Tuna
-
 Binaries:
 
 * [nuget](https://www.nuget.org/packages?q=mvvmcross)
