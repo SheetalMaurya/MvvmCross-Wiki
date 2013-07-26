@@ -387,4 +387,4 @@ Each UI Platform provides a `Presenter` which implement `IMvxViewPresenter`
 
 In default applications, the `Presenter` used normally fills the entire screen with a `Page` and allows back button navigation to previous pages.
 
-When more advanced screen layouts are needed - e.g. flyouts, tabs, pivots, split-screens, etc - then these can be supplied by using a custom presenter. For more on this, see TODO-LINK-TO-SETUP
+When more advanced screen layouts are needed - e.g. flyouts, tabs, pivots, split-screens, etc - then these can be supplied by using a custom presenter. For more on this, see http://slodge.blogspot.co.uk/2013/06/presenter-roundup.html
