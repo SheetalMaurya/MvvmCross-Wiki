@@ -23,6 +23,8 @@ Samples and Videos:
 *   **[N Plus 1 Videos Of MvvmCross](/slodge/MvvmCross/wiki/N-1-Videos-Of-MvvmCross)**
 *   Evolve 2013 talk - http://xamarin.com/evolve/2013#session-dnoeeoarfj
 *   NDC 2013 talk - http://slodge.blogspot.co.uk/2013/06/ndc2013-mobile-mvvm-and-xamarin-talks.html
+*   Xaminar - 2012 - http://slodge.blogspot.com/2012/12/mvvmcross-video-presentation-xaminar.html
+*   MvvmCross and Azure - 2012 - http://slodge.blogspot.co.uk/2012/11/azure-to-wpmonodroidmonotouch-video-of.html
 
 General articles:
 
@@ -40,6 +42,7 @@ iOS Articles:
 
 The Tip Calc tutorial:
 
+  *   Before reading this consider **[N Plus 1 Videos Of MvvmCross](/slodge/MvvmCross/wiki/N-1-Videos-Of-MvvmCross)**
   *   **[v3 02 00 Tip Calc A first app](/slodge/MvvmCross/wiki/v3-02-00-Tip-Calc-A-first-app)**
   *   **[v3 02 01 Tip Calc   The Core Project](/slodge/MvvmCross/wiki/v3-02-01-Tip-Calc---The-Core-Project)**
   *   **[v3 02 03 Tip Calc A Xamarin.Android UI project](/slodge/MvvmCross/wiki/v3-02-03-Tip-Calc-A-Xamarin.Android-UI-project)**
@@ -48,6 +51,18 @@ The Tip Calc tutorial:
   *   **[v3 02 06 Tip Calc Windows Store Project](/slodge/MvvmCross/wiki/v3-02-06-Tip-Calc-Windows-Store-Project)**
   *   **[v3 02 07 Tip Calculator A Wpf UI Project](/slodge/MvvmCross/wiki/v3-02-07-Tip-Calculator-A-Wpf-UI-Project)**
   *   **[v3 02 10 Tip Calculator   A recap](/slodge/MvvmCross/wiki/v3-02-10-Tip-Calculator---A-recap)**
+
+
+Questions and support:
+
+  * on StackOverflow - http://stackoverflow.com/questions/tagged/mvvmcross
+  * on Xamarin forums - http://forums.xamarin.com/search?Search=mvvmcross
+
+Contact - but **no** technical questions please:
+
+  * on Twitter - [@MvvmCross](https://twitter.com/MvvmCross)
+  * by chat - [Jabbr/mvvmcross](https://jabbr.net/#/rooms/mvvmcross)
+  * by email - [mvvmcross email](http://slodge.blogspot.co.uk/2013/06/my-standard-reply-to-mvvmcross-support.html)
 
 
 If you would like to help with the project - including the documentation - then please get in touch :)
