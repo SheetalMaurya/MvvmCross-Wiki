@@ -53,7 +53,7 @@ In the View:
      - custom C# methods have to be used to get and set the variable values
      - custom Java listeners or Objective-C delegates have to be used to detect when the UI View state changes (e.g. when the user enters text or taps on a button).
 
-For more info on the details on implementing custom bindings, see **TODO - N+1 maybe?**
+For more info on the details on implementing custom bindings, see http://slodge.blogspot.co.uk/2013/06/n28-custom-bindings-n1-days-of-mvvmcross.html
 
 ### DataBound properties
 
@@ -835,7 +835,7 @@ To add these properties to your Windows Phone, Store or WPF MvvmCross app:
            mvx:Bi.nd="Text Customer.FirstName; Visible=ShowFirstName" />
 
 
-- for design-time support, you may also need to pull in additional value converters into the Xaml namespace. More information on this is available in **TODO-NOT-YET-WRITTEN-ALSO-CONSIDER-RUNTIME-VALUE-CONVERTER-LOADING-TOO**.
+- for design-time support, you may also need to pull in additional value converters into the Xaml namespace. For more on this, see http://slodge.blogspot.co.uk/2013/07/n35-multibinding-with-tibet-n1-videos.html
 
 Once installed, the syntax within these `AttachedProperties` bindings is exactly the same as within all other Swiss and Tibet binding - and this binding functionality can be extended with custom bindings, with FieldBinding, etc - just as in MvvmCross on non-Xaml platforms.
 
