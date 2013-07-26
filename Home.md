@@ -11,14 +11,15 @@ For more information please also see:
 - the N+1 video series under production - [N Plus 1 Videos Of MvvmCross](/slodge/MvvmCross/wiki/N-1-Videos-Of-MvvmCross)
 - Questions and answers on StackOverflow - http://stackoverflow.com/questions/tagged/mvvmcross
 
-Samples:
+Binaries:
 
-- https://github.com/slodge/MvvmCross/wiki/MvvmCross-Tutorials
- - https://github.com/slodge/MvvmCross-Tutorials/
- - https://github.com/slodge/NPlus1DaysOfMvvmCross/
+* [nuget](https://www.nuget.org/packages?q=mvvmcross)
+* [Github: MvvmCross-Binaries](https://github.com/slodge/MvvmCross-Binaries/)
+* [Stuart's Skydrive link](http://sdrv.ms/URCbYN)
 
-Videos:
+Samples and Videos:
 
+*  [MvvmCross Tutorials](https://github.com/slodge/MvvmCross/wiki/MvvmCross-Tutorials)
 *   **[N Plus 1 Videos Of MvvmCross](/slodge/MvvmCross/wiki/N-1-Videos-Of-MvvmCross)**
 *   Evolve 2013 talk - http://xamarin.com/evolve/2013#session-dnoeeoarfj
 *   NDC 2013 talk - http://slodge.blogspot.co.uk/2013/06/ndc2013-mobile-mvvm-and-xamarin-talks.html
@@ -49,4 +50,4 @@ The Tip Calc tutorial:
   *   **[v3 02 10 Tip Calculator   A recap](/slodge/MvvmCross/wiki/v3-02-10-Tip-Calculator---A-recap)**
 
 
-If you would like to help with documentation, then please get in touch :)
+If you would like to help with the project - including the documentation - then please get in touch :)
