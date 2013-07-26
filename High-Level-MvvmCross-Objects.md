@@ -36,7 +36,7 @@ When an MvvmCross app starts on a native project, then:
 
 - the native Application will 'be created' first
 - within the construction of the native Application, a `Setup` will be created
- - the `Setup` will perform very basic tasks - e.g. initialisation of the IoC system (see LINK TO IOC)
+ - the `Setup` will perform very basic tasks - e.g. initialisation of the IoC system (see https://github.com/slodge/MvvmCross/wiki/Service-Location-and-Inversion-of-Control)
  - then the `Setup` will call into the core project, construct an `App` and will call `Initialize` on it.
  - during the `Initialize` your App will typically: 
   - register your app-specific services with the IoC system
@@ -100,7 +100,7 @@ This `App`:
  - call `RegisterAppStart<TViewModel>` to create and register a very simple `IMvxAppStart` implementation - an implementation which always shows a single `FirstViewModel` when `Start()` is called
 - uses the default `ViewModelLocator` - this default uses naming conventions to locate and construct `ViewModels` and creates a new `ViewModel` for each and every request from a `View`
 
-If you wanted to use a custom ImvxAppStart object, see TODO.
+If you wanted to use a custom `IMvxAppStart` object, see https://github.com/slodge/MvvmCross/wiki/Customising-using-App-and-Setup.
 
 ### ViewModels
 
@@ -149,9 +149,13 @@ This `FirstViewModel` has:
  
 Beyond this simple example, `ViewModels` can also:
 
-- contain dynamic lists (TODO link to ObservableCollections)
-- be constructed from IoC (TODO link to CIRS)
-- use 'techniques' like `MvxCommandCollection`, `IMvxINPCInterceptor` and Fody to remove some of the boilerplate code (TODO - links)
+- contain dynamic lists (see https://github.com/slodge/MvvmCross/wiki/MvvmCross-Tutorials#working-with-collections)
+- be constructed from IoC (https://github.com/slodge/MvvmCross/wiki/Service-Location-and-Inversion-of-Control)
+- use 'techniques' like:
+  - `MvxCommandCollection` (see http://slodge.blogspot.co.uk/2013/03/fixing-mvvm-commands-making-hot-tuna.html), 
+  - `IMvxINPCInterceptor` (see http://slodge.blogspot.co.uk/2013/07/intercepting-raisepropertychanged.html)
+  - Fody to remove some of the boilerplate code (http://slodge.blogspot.co.uk/2013/07/awesome-clean-viewmodels-via-fody.html)
+  - Rio binding (see http://slodge.blogspot.co.uk/2013/07/n36-rio-binding-carnival.html)
 
 ##The MvvmCross UI
 
@@ -279,7 +283,7 @@ Some key ones you should be aware of are:
 - `CreateDebugTrace` - a chance to customise where application trace is placed - see http://stackoverflow.com/a/17234083/373321 for an example
 - `InitializeLastChance` - a "last ditch" placeholder for any steps you want to take after all of earlier steps have happened.  Note that the Android and iOS base Setup classes use 'last chance' for initializing the UI data-binding system, so it's important to always call `base.InitializeLastChance()` in your override.
 
-Beyond this, a larger list of Setup customisation options is discussed in TODO-LINK
+Beyond this, a larger list of Setup customisation options is discussed in https://github.com/slodge/MvvmCross/wiki/Customising-using-App-and-Setup
 
 ####Minimal Setup - Android
 
@@ -379,7 +383,7 @@ On each platform, Views in the Mvvm sense are typically implemented using data-b
 
 Within this introduction we won't go further into how these Views are actually written - instead see the introductions to data-binding on each platform within the TipCalc tutorial.
 
-One important thing to note, is that by default `View`s are associated with `ViewModel`s using a naming convention in MvvmCross. This can be overridden if required (see the TODO-LINK-SETUP) - but by default the MvvmCross system links a View called `FooView` to a ViewModel called `FooViewModel`
+One important thing to note, is that by default `View`s are associated with `ViewModel`s using a naming convention in MvvmCross. This can be overridden if required (see the https://github.com/slodge/MvvmCross/wiki/Customising-using-App-and-Setup#overriding-view-viewmodel-associations) - but by default the MvvmCross system links a View called `FooView` to a ViewModel called `FooViewModel`
 
 ###A Presenter
 
