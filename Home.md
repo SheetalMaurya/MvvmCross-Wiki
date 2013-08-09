@@ -18,8 +18,9 @@ General articles:
 *   **[The MvvmCross Manifesto](/slodge/MvvmCross/wiki/The-MvvmCross-Manifesto)**
 *   **[High Level MvvmCross Objects](/slodge/MvvmCross/wiki/High-Level-MvvmCross-Objects)**
 *   **[View Model Lifecycle](/slodge/MvvmCross/wiki/View-Model-Lifecycle)**
-*   **[ViewModel  to ViewModel navigation](/slodge/MvvmCross/wiki/ViewModel--to-ViewModel-navigation)**
 *   **[Databinding](/slodge/MvvmCross/wiki/Databinding)**
+*   **[Value Converters](/slodge/MvvmCross/wiki/Value-Converters)**
+*   **[ViewModel  to ViewModel navigation](/slodge/MvvmCross/wiki/ViewModel--to-ViewModel-navigation)**
 *   **[Customising App and Setup ](https://github.com/slodge/MvvmCross/wiki/Customising-using-App-and-Setup)**
 *   **[Service Location and Inversion of Control](/slodge/MvvmCross/wiki/Service-Location-and-Inversion-of-Control)**
 
