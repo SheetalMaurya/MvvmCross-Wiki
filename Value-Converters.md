@@ -288,7 +288,7 @@ If you require other visibility logic - e.g. if you need a mapping for a `nullab
 
 To use these converters on each platform, use:
 
-- Droid:
+- Droid (not that in Droid there is no support for the `Invisible` state - cross platform, we only support `Visible` and `Gone`):
   
         local:MvxBind="Visibility Visibility(VMProperty)"
         
@@ -310,6 +310,16 @@ To use these converters on each platform, use:
 Note: to use the Visibility converters at design-time on the Windows platforms, you can include the design-time helper objects - `MvxVisibilityDesignTimeHelper` - these can be used as:
 
         <visibility:MvxVisibilityDesignTimeHelper x:Key="DesignTimeVisibility" />
+
+If you need to create your own Visibility ValueConverter's then the `MvxBaseVisibilityValueConverter<T>` and `MvxBaseVisibilityValueConverter` base classes can assist with this - e.g.:
+
+	public class SayPleaseVisibilityValueConverter : MvxBaseVisibilityValueConverter<string>
+	{
+		protected override MvxVisibility Convert(string value, object parameter, CultureInfo culture)
+                {
+                    return (value == "Please) ? MvxVisibility.Visible : MvxVisibility.Collapsed;
+                }
+	}
 
 **Note:** In addition to the `Visibility` properties that are available on all `UIElement`s within Xaml, MvvmCross also provides a `Visible` custom binding - allowing ViewModel properties of type `Boolean` to be bound directly to the UI visibility without using the `VisibilityConverter` - e.g.:
 
