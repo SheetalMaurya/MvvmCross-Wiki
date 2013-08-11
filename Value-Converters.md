@@ -551,3 +551,58 @@ This could be used in a binding to count (for example) how many peoples have bee
 Note that it's unusual for a ValueCombiner to meaningfully implement `SetValue` - this is because it's unusual (but not unheard of) for multi-bindings to support updating of the multiple source elements from changes in the View.
 
 Developers are very welcome to write their own ValueCombiners if they wish to - please do - but please also be aware that it's likely that this internal `IMvxValueCombiner` API will change in future MvvmCross revisions - we are looking at ways to either simplify this Tibet binding interface and/or ways to make the binding structure more Type-aware so that conversions can be performed at more places within the binding engine. (Developers are also very welcome to suggest improvements for this API!)
+
+
+### Available ValueCombiners
+
+**TODO** - this section is draft - a work in progress.
+
+The 'standard' ValueCombiners available in MvvmCross are:
+
+- `If` - used for if-else conditional display with syntax 
+
+        If(booleab-test, value-if-true, value-if-false)
+
+   For example:
+
+        If(HasProAccount, ExtendedName, PromotionalMessage)
+
+- `Format` - used for displaying strings using the standard C# CLR `string.Format` syntax.
+
+        Format(format-string, input-arguments...)
+
+   For example:
+
+        Format("{0:ddMMMyyyy} - {1} - {2:0.000}", Entry.Date, Entry.Location, Entry.Reading)
+
+- `And` and `Or` - used for logical combinations. Also available as operators - `&&` and `||`
+
+        And(test-one, test-two, ...)
+        test-one && test-two
+
+        Or(test-one, test-two, ...)
+        test-one || test-two
+
+
+   For example:
+
+        And(HasProAccount, HasCreditCardDetails)
+        HasProAccount && HasCreditCardDetails
+
+- Plus - used for contatenation or addition - works with `string`, `int`, `double` Types (other input types may be accepted, but will be converted to one of these types). Also available as the `+` operator
+
+        Plus(item-one, item-two, ...)
+     
+        item-one + item-two
+
+
+   For example:
+
+         Add(SubTotal, Tax)
+
+         FirstName + ' ' + LastName
+
+- To be coninued... Minus, Multiply, Divide, Modulus, etc
+
+- To be continued... GreaterThan, EqualTo, LessThan, etc
+
