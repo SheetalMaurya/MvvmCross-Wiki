@@ -606,3 +606,4 @@ The 'standard' ValueCombiners available in MvvmCross are:
 
 - To be continued... GreaterThan, EqualTo, LessThan, etc
 
+- To be continued... RGB from the Color plugin
