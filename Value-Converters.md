@@ -599,9 +599,9 @@ The 'standard' ValueCombiners available in MvvmCross are:
         And(HasProAccount, HasCreditCardDetails)
         HasProAccount && HasCreditCardDetails
 
-- Plus - used for contatenation or addition - works with `string`, `int`, `double` Types (other input types may be accepted, but will be converted to one of these types). Also available as the `+` operator
+- Add - used for contatenation or addition - works with `string`, `int`, `double` Types (other input types may be accepted, but will be converted to one of these types). Also available as the `+` operator
 
-        Plus(item-one, item-two, ...)
+        Add(item-one, item-two, ...)
      
         item-one + item-two
 
@@ -612,8 +612,8 @@ The 'standard' ValueCombiners available in MvvmCross are:
 
          FirstName + ' ' + LastName
 
-- To be coninued... Minus, Multiply, Divide, Modulus, etc
+- To be coninued... Subtract, Multiply, Divide, Modulus, etc
 
-- To be continued... GreaterThan, EqualTo, LessThan, etc
+- To be continued... GreaterThan, EqualTo, LessThan, GreaterThanOrEqualTo, LessThanOrEqualTo etc
 
 - To be continued... RGB from the Color plugin
