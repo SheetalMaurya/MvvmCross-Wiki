@@ -217,6 +217,53 @@ Then when a client calls `Mvx.Resolve<ITaxCalculator>()` then what will happen i
 
 Further, this process is **recursive** - so if any of these returned objects requires another object  - e.g. if your `IForeignExchange` implementation requires a `IChargeCommission` object - then MvvmCross will provide Resolve for you as well.
 
+## Dynamic dependencies on singleton types
+While it is possible to a singleton have a dynamic type as dependency (e.g., those which return a new instance every time they are resolved), the singleton will hold forever the first reference it receives, which is not what you probably want. 
+
+Take the following code: 
+```csharp
+// Registered with Mvx.RegisterType<IBar, Bar>();
+public class Bar : IBar
+{
+	
+}
+
+public class FooSingleton : IFooSingleton
+{
+	private readonly IBar bar;
+
+	public FooSingleton(IBar bar)
+	{
+		// This "bar" instance will be held forever, 
+		// no other instance will be created for the 
+		// lifetime of this singleton 
+		this.bar = bar;
+	}
+}
+```
+
+In this case, `FooSingleton` is obviously registered as a singleton within MvvmCross, and when it is created it will receive a instance of `Bar`, and never look back for another one, using only that instance. 
+
+One possible approach for this problem is to give up on the constructor dependency and dynamically resolve the dependency internaly, using `Mvx.Resolve`. Something like this:
+
+```csharp
+public class FooSingleton : IFooSingleton
+{
+	public FooSingleton()
+	{
+		// No "Bar" dependency in the constructor
+	}
+
+	// Relies on the private property to delegate
+	// to Mvx.Resolve every time it is needed
+	private IBar Bar
+	{
+		get { return Mvx.Resolve<IBar>(); }
+	}
+}
+```
+
+
 ## How do I use IoC when I need different implementations on different platforms?
 
 Sometimes you need to use some platform specific functionality in your ViewModels. e.g. for example, you might want to get the current screen dimensions in your ViewModel - but there's no existing portable .Net call to do this.
