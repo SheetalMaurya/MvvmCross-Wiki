@@ -39,7 +39,15 @@ If you did this, then any code can call:
 
         var foo = Mvx.Resolve<IFoo>();
 
-and every single call would return **the same instance** of Foo
+and every single call would return **the same instance** of Foo. 
+
+Another approach is to defer creation of the singleton to MvvmCross, which is specially useful when it has contructor dependencies: 
+
+```csharp
+// Register the singleton instance to be created by MvvmCross, so 
+// it can handle any contructor dependency
+Mvx.ConstructAndRegisterSingleton<IFoo, Foo>();
+```
 
 ### Lazy Singleton Registration
 
@@ -54,6 +62,14 @@ In this case:
 - no `Foo` is created initially
 - the first time any code calls `Mvx.Resolve<IFoo>()` then a new `Foo` will be created and returned
 - all subsequent calls will get the same instance that was created the first time
+ 
+It is also possible to let MvvmCross instantiate the lazy singleton for you, also handling any constructor dependency it may have: 
+
+```csharp
+// An instance will be created only when it is first requested, 
+// and all constructor dependencies will be automatically resolved and filled 
+Mvx.LazyConstructAndRegisterSingleton<IFoo, Foo>();
+```
 
 ### 'Dynamic' Registration
 
