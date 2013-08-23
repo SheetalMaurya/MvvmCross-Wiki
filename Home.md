@@ -23,8 +23,7 @@ General articles:
 *   **[ViewModel  to ViewModel navigation](/slodge/MvvmCross/wiki/ViewModel--to-ViewModel-navigation)**
 *   **[Customising App and Setup ](https://github.com/slodge/MvvmCross/wiki/Customising-using-App-and-Setup)**
 *   **[Service Location and Inversion of Control](/slodge/MvvmCross/wiki/Service-Location-and-Inversion-of-Control)**
-*   **[Plugins](/slodge/MvvmCross/wiki/MvvmCross-plugins
-)**
+*   **[Plugins - draft](/slodge/MvvmCross/wiki/MvvmCross-plugins)**
 
 iOS Articles:
 
