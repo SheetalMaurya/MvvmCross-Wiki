@@ -304,7 +304,7 @@ If you want to see how these plugins can be used in your applications, then:
   - N=9 - Messenger http://slodge.blogspot.co.uk/2013/05/n9-getting-message-n1-days-of-mvvmcross.html
   - N=10 - SQLite http://slodge.blogspot.co.uk/2013/05/n10-sqlite-persistent-data-storage-n1.html
   - N=12 -> N=17 - the Collect-A-Bull app http://slodge.blogspot.co.uk/2013/05/n12-collect-bull-full-app-part-1-n1.html
-
+- see the [Plugins](https://github.com/slodge/MvvmCross/wiki/MvvmCross-plugins) article 
 
 ####Plugin Authoring
 
@@ -329,8 +329,10 @@ I'm not going to go into any more detail on writing plugins here.
 
 If you'd like to see more about writing your own plugin, then:
 
+- see the [Plugins](https://github.com/slodge/MvvmCross/wiki/MvvmCross-plugins) article 
 - there's a presentation on this at https://speakerdeck.com/cirrious/plugins-in-mvvmcross
 - there's a sample which creates a `Vibrate` plugin at https://github.com/slodge/MvvmCross-Tutorials/tree/master/GoodVibrations 
+
 
 ## What if...
 
