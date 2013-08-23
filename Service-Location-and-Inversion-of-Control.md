@@ -215,7 +215,7 @@ If you then register this calculator as:
 
 Then when a client calls `Mvx.Resolve<ITaxCalculator>()` then what will happen is that MvvmCross will create a new `TaxCalculator` instance, resolving all of `ICustomerRepository` `IForeignExchange` and `ITaxRuleList` during the operation.
 
-Further, this process is **recursive** - so if any of these returned objects requires another object  - e.g. if your `IForeignExchange` implementation requires a `IChargeCommission` object - then MvvmCross will provide Resolve for you as well.
+Further, this process is **recursive** - so if any of these returned objects requires another object  - e.g. if your `IForeignExchange` implementation requires a `IChargeCommission` object - then MvvmCross will use `Resolve` to provide an `IChargeCommission` instance for you.
 
 ## How do I use IoC when I need different implementations on different platforms?
 
@@ -366,6 +366,79 @@ This can be initialised using a Setup override of:
 The IoC container in MvvmCross is designed to be quite lightweight and is targeted at a level of functionality required in the mobile applications I have built.
 
 If you need more advanced/complex functionality, then you may need to use a different provider or a different approach - some suggestions for this are discussed in: http://stackoverflow.com/questions/16514691/child-containers-in-mvvmcross-ioc
+
+
+## What if... I want to mix Dynamic and Singleton types
+
+If you use constructor injection, then for each dependency you can only ever receive a single instance. In some cases this may not be what you want. 
+
+Take the following code: 
+
+    // Registered with Mvx.RegisterType<IBar, Bar>();
+    public class Bar : IBar
+    {
+       public void DoStuff()
+       {
+          // implementation
+       }
+    }
+
+    // Registered with Mvx.ConstructAndRegisterSingleton<IFooSingleton, FooSingleton>();
+    public class FooSingleton : IFooSingleton
+    {
+       private readonly IBar _bar;
+    
+       public FooSingleton(IBar bar)
+       {
+         // This "bar" instance will be held forever, 
+         // no other instance will be created for the 
+         // lifetime of this singleton 
+         _bar = bar;
+       }
+
+       public void DoFoo()
+       {
+          _bar.DoStuff();
+       }
+    }
+
+In this case, `FooSingleton` is registered as a singleton within MvvmCross, and when it is created it will receive a instance of `Bar`, which it will always use.
+
+If instead, you wanted the `FooSingleton` to request a new instance each time then you could remove the constructor injection and instead use dynamic resolution - for example:
+
+    public class FooSingleton : IFooSingleton
+    {
+      public FooSingleton()
+      {
+        // No "IBar" dependency in the constructor
+      }
+
+      public void DoFoo()
+      {
+         var bar = Mvx.Resolve<IBar>();
+         bar.DoStuff();
+      }
+    }
+
+As another alternative, you could continue to use constructor injection, but could use an `IBarFactory` dependency instead of an `IBar` - e.g.:
+
+    public class FooSingleton : IFooSingleton
+    {
+      private readonly IFactory<IBar> _barFactory;
+
+      public FooSingleton(IFactory<IBar> barFactory)
+      {
+        _barFactory = barFactory;
+      }
+
+      public void DoFoo()
+      {
+         var bar = _barFactory.Create();
+         bar.DoStuff();
+      }
+    }
+
+Understanding object lifecycles in this type of situation - where some objects are dynamic and some are singletons - can be difficult, especially in large applications. To work with these type of objects it may help to adopt and follow patterns and naming conventions within your application - these may allow developers to more easily identify which interfaces should and should not be used dynamically.
 
   [1]: http://www.martinfowler.com/articles/injection.html
   [2]: http://joelabrahamsson.com/inversion-of-control-an-introduction-with-examples-in-net/
