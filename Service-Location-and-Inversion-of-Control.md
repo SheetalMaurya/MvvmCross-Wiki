@@ -41,6 +41,11 @@ If you did this, then any code can call:
 
 and every single call would return **the same instance** of Foo
 
+An alternative syntax for singleton registration - especially useful when the registered type requires constructor dependency injection - is: 
+
+        // every time someone needs an IFoo they will get the same one
+        Mvx.ConstructAndRegisterSingleton<IFoo, Foo>(); 
+
 ### Lazy Singleton Registration
 
 As a variation on this, you could register a lazy singleton. This is written
@@ -54,6 +59,12 @@ In this case:
 - no `Foo` is created initially
 - the first time any code calls `Mvx.Resolve<IFoo>()` then a new `Foo` will be created and returned
 - all subsequent calls will get the same instance that was created the first time
+
+An alternative syntax for lazy singleton registration - especially useful when the registered type requires constructor dependency injection - is: 
+
+        // every time someone needs an IFoo they will get the same one
+        Mvx.LazyConstructAndRegisterSingleton<IFoo, Foo>(); 
+
 
 ### 'Dynamic' Registration
 
