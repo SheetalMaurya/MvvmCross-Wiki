@@ -24,6 +24,7 @@ General articles:
 *   **[Customising App and Setup ](https://github.com/slodge/MvvmCross/wiki/Customising-using-App-and-Setup)**
 *   **[Service Location and Inversion of Control](/slodge/MvvmCross/wiki/Service-Location-and-Inversion-of-Control)**
 *   **[Plugins - draft](/slodge/MvvmCross/wiki/MvvmCross-plugins)**
+*   **[Dialog - very draft](/slodge/MvvmCross/wiki/CrossUI---MonoTouch.Dialog-and-MonoDroid.Dialog-with-MvvmCross)**
 
 iOS Articles:
 
