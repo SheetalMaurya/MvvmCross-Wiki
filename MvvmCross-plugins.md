@@ -1,14 +1,10 @@
-**THIS IS DRAFT CONTENT ONLY - WRITTEN ON A TRAIN WITHOUT INTERNET CONNECTION - LOTS OF TODOS STILL OPEN **
-**THIS IS DRAFT CONTENT ONLY - WRITTEN ON A TRAIN WITHOUT INTERNET CONNECTION - LOTS OF TODOS STILL OPEN **
-**THIS IS DRAFT CONTENT ONLY - WRITTEN ON A TRAIN WITHOUT INTERNET CONNECTION - LOTS OF TODOS STILL OPEN **
-
 MvvmCross provides a plugin system to allow developers to provide IoC-injectable functionality at run-time.
 
 This functionality can include both portable and platform-specific code, and can easily be substituted for mock implementations during tests.
 
 Plugins are really just a layer on top of MvvmCross's IoC/Service Resolution implementation - they use a filename-based convention to make it easier to share cross-platform blocks of functionality.
 
-For more background on the MvvmCross IoC and Service Resolution APIs, see TODO.
+For more background on the MvvmCross IoC and Service Resolution APIs, see [Service Location and Inversion of Control](https://github.com/slodge/MvvmCross/wiki/Service-Location-and-Inversion-of-Control).
 
 ### General Introductions
 
@@ -16,8 +12,8 @@ This article is long and detailed.
 
 For more gentle introductions to using and building plugins, see:
 
-- the N+1 video on `Location` and `Messenger` - TODO-LINK
-- the N+1 video on TODO - TODO-LINK
+- the N+1 video on `Location` and `Messenger` - http://slodge.blogspot.co.uk/2013/05/n9-getting-message-n1-days-of-mvvmcross.html
+- the N+1 video on IoC and Plugins - http://slodge.blogspot.co.uk/2013/06/n31-injection-platform-specific.html
 
 
 ### FAQ: Why use lots of small plugins?
@@ -68,7 +64,7 @@ The `IMvxPluginManager` is supplied by each MvvmCross platform. The work the `Pl
 	       var manager = Mvx.Resolve<IMvxPluginManager>();
 	       manager.EnsurePlatformAdaptionLoaded<PluginLoader>();
  
-  - sometimes, the plugins will also register with IoC for Callbacks when parts of MvvmCross are started. For example, the Color plugin calls  `Mvx.CallbackWhenRegistered<IMvxValueConverterRegistry>(callback)` in order to get notified when the ValueConverterRegistry is available (the Color plugin uses this callback to register its Color ValueConverters - see TODO). 
+  - sometimes, the plugins will also register with IoC for Callbacks when parts of MvvmCross are started. For example, the Color plugin calls  `Mvx.CallbackWhenRegistered<IMvxValueConverterRegistry>(callback)` in order to get notified when the ValueConverterRegistry is available (the Color plugin uses this callback to register its Color ValueConverters - see [Mvx Color Value Conversion](https://github.com/slodge/MvvmCross/wiki/Value-Converters#the-mvx-color-valueconverters)). 
 - if the manager is called back with an `EnsurePlatformAdaptionLoaded<TPlugin>()` call, then the manager will attempt to load up a platform-specific Assembly:
 
   -  it finds this using the core filename plus an extension. For example, if the core PCL plugin Assembly is called `Acme.MyPlugin.dll` then the Manager knows that the Droid adaption for that plugin will be called `Acme.MyPlugin.Droid.dll`
@@ -391,7 +387,7 @@ The `Color` plugin provides native implementations for conversion from the cross
 
 This plugin is available on all platforms.
 
-This plugin also provides a number of useful Color-outputting ValueConverters - see TODO for information on these. If you wish to create your own Color ValueConverters, then this plugin provides the base classes `MvxColorValueConverter` and `MvxColorValueConverter<T>`.
+This plugin also provides a number of useful Color-outputting ValueConverters - see [Mvx Color Value Conversion](https://github.com/slodge/MvvmCross/wiki/Value-Converters#the-mvx-color-valueconverters) for information on these. If you wish to create your own Color ValueConverters, then this plugin provides the base classes `MvxColorValueConverter` and `MvxColorValueConverter<T>`.
 
 The Android version of this plugin also registers some Binding Targets for use with Color 
 
@@ -418,7 +414,7 @@ The caches used by these helpers are configured `MvxDownloadCacheConfiguration` 
 Known issues:
 
 - this cache is a complicated implementation, has been well tested in apps, but is poorly unit tested currently
-- one user has reported MonoTouch download issues in certain network conditions - these problems seem to be related to known MonoTouch issues - see TODO and TODO. That first StackOverflow post has a suggested workaround - overriding the `IMvxHttpFileDownloader` registration with an implementation which uses the UIKit TODO method.
+- one user has reported MonoTouch download issues in certain network conditions - these problems seem to be related to known MonoTouch issues - see [StackOverflow Q&A on this](http://stackoverflow.com/questions/17238809/mvxdynamicimagehelper-unreliable). That first StackOverflow post has a suggested workaround - overriding the `IMvxHttpFileDownloader` registration with an implementation which uses the `UIImage.LoadFromData` method.
 
 ### Email
 
@@ -499,7 +495,7 @@ The field in this class could be accessed using Android syntax:
         android:layout_height='wrap_content'
         local:MvxBind='Text LastName' />
 
-For more on Rio FieldBinding see N=36 on TODO
+For more on Rio FieldBinding see the [N=36 video](http://slodge.blogspot.co.uk/2013/07/n36-rio-binding-carnival.html)
 
 ### File
 
@@ -564,7 +560,7 @@ The Serialize and Deserialize implementations used are 'default' Json.Net implem
         DateFormatHandling = DateFormatHandling.IsoDateFormat,
     }
  
-The version of Json.Net referenced is the PCL version TODO
+The version of Json.Net referenced is an old PCL version - 4.5.4.14825
 
 Json.Net is a popular library and it may be that the use of this old PCL version will conflict with another library your app is using. If this is the case, then it should be relatively straight-forward to **not** load the Json plugin, and to instead build your own implementations of `IMvxTextSerializer` and `IMvxJsonConverter`.
 
@@ -614,16 +610,16 @@ The `JsonLocalisation` plugin is a single PCL Assembly and isn't really a typica
 
 For advice on using the JsonLocalisation library, see:
 
-- the Babel sample - TODO
-- the N+1 video N=21 which discusses how i18n is built.
+- the Babel sample - https://github.com/slodge/MvvmCross-Tutorials/tree/master/Babel
+- the N+1 video N=21 which discusses how i18n is built - http://slodge.blogspot.co.uk/2013/05/n21-internationalisation-i18n-n1-days.html
 
 Notes:
 
 - the standard JsonLocalisation implementation relies on the `ResourceLoader` and `Json` plugins for loading Json files from the application package contents.
 - several alternative Localisation implementations have been suggested including:
-  - using Microsoft Resx files - possibly while also using Vernacular from Rdio. For a detailed blog post on using Resx files in MvvmCross, see TODO(Stefan)
-  - using EmbeddedResources to store the Json files in the Core PCL assembly (see TODO)
-  - using a single JSON file or a single CSV (Comma Separated Variables) file to store all languages in one single file (see TODO)
+  - using Microsoft Resx files - possibly while also using Vernacular from Rdio. For a detailed blog post on using Resx files in MvvmCross, see http://opendix.blogspot.co.uk/2013/05/using-resx-files-for-localization-in.html
+  - using EmbeddedResources to store the Json files in the Core PCL assembly (see https://github.com/slodge/MvvmCross/issues/55)
+  - using a single JSON file or a single CSV (Comma Separated Variables) file to store all languages in one single file (again see https://github.com/slodge/MvvmCross/issues/55)
   
   we *hope* that some of these alternatives will become open source realities in the future
   
@@ -677,15 +673,15 @@ An example implementation of such a service is:
         }
     }
 
-For a good walk-through of using the location plugin, including using it in tandem with the MvvmCross messenger, see both N=8 and N=9 in N+1 videos of MvvmCross - TODO-LINK
+For a good walk-through of using the location plugin, including using it in tandem with the MvvmCross messenger, see both N=8 and N=9 in N+1 videos of MvvmCross - [N+1 videos](https://github.com/slodge/MvvmCross/wiki/N-1-Videos-Of-MvvmCross)
 
 
 Notes:
 
 - the `MvxGeoLocationOptions` object passed into the Start method provides a number of options like `EnableHighAccuracy` - not all of these options are well implemented on all platforms
 - the default implementation is a good 'general' module if you just need 'location information' in your app. If your app requires more - e.g. control over time and distance tracking, geo-fencing, etc - then consider building your own plugin (or injecting your own service from the UI project on each platform). The source code for the Location plugin should provide you with a good starting place for this.
-- it's not unusual for Android developers to hit issues with location detection on different phones and on different Android - check StackOverflow for questions and answers - TODO-LINK
-- the MvvmCross coordinates object - MvxCoordinates - does not currently come with any built-in maths operations. Algorithms for some common coordinate operations can be found on (for example) TODO.
+- it's not unusual for Android developers to hit issues with location detection on different phones and on different Android - check StackOverflow and Issues for questions and answers - e.g. https://github.com/slodge/MvvmCross/issues/360
+- the MvvmCross coordinates object - MvxCoordinates - does not currently come with any built-in maths operations. Algorithms for some common coordinate operations can be found on (for example) http://slodge.blogspot.co.uk/2012/04/calculating-distance-between-latlng.html.
 
 ### Messenger
 
@@ -855,7 +851,7 @@ The `Save` method in this class could be accessed using Android syntax:
         local:MvxBind='Click Save' />
        
 
-For more on Rio MethodBinding see N=36 on TODO
+For more on Rio MethodBinding see N=36 on http://slodge.blogspot.co.uk/2013/07/n36-rio-binding-carnival.html
 
 ### Network
 
@@ -866,7 +862,7 @@ The original purpose of the `Network` plugin was to provide `IMvxReachability` *
         bool IsHostReachable(string host);
     }
 
-**Note:** this interface is currently implemented on iOS only, although some contributors are working on other platforms (e.g. for Android see TODO)
+**Note:** this interface is currently implemented on iOS only, although some contributors are working on other platforms (e.g. for Android see https://github.com/slodge/MvvmCross/issues/362)
 
 Since this original purpose, Network has now further been expanded to provide a simple Rest implementation - and this is available on Droid, Touch, WindowsPhone, WindowsStore and Wpf.
 
@@ -928,7 +924,7 @@ To use the Json APIs, you must have an `IMvxJsonConverter` implementation availa
 Note:
 
 - This Rest module is a 'light-weight' implementation which works for many simple Rest web services.
-- For more advanced web service requirements, consider extending the classes offered here or consider importing other more established Rest libraries such as RestSharp (TODO - link).
+- For more advanced web service requirements, consider extending the classes offered here or consider importing other more established Rest libraries such as RestSharp (http://restsharp.org/).
 
 ### PhoneCall
 
@@ -945,8 +941,8 @@ The PhoneCall plugin is very simple - e.g. it doesn't provide any detection of w
 
 Sample using the PhoneCall plugin include:
 
-- CustomerManagement - TODO
-- Conference - TODO
+- CustomerManagement - https://github.com/slodge/MvvmCross-Tutorials/tree/master/Sample%20-%20CustomerManagement
+- Conference - https://github.com/slodge/MvvmCross-Tutorials/tree/master/Sample%20-%20CirriousConference
 
 
 ### PictureChooser
@@ -984,7 +980,7 @@ The reason for this is because of Android's Activity lifecyle. The Android lifec
 
 If you want to use this `IMvxPictureChooserTask` effectively and reliably on Android then you really need to call this API via a service class, to use Messaging to pass the returned message back to a ViewModel and to implement 'tombstoning' support for that ViewModel.
 
-There is a simple demo for `IMvxPictureChooserTask` in TODO - however, this simple demo doesn't currently show this full Android technique. (TODO - log issue)
+There is a simple demo for `IMvxPictureChooserTask` in [PictureTaking](https://github.com/slodge/MvvmCross-Tutorials/tree/master/PictureTaking) - however, this simple demo doesn't currently show this full Android technique. 
 
 **Note:** On WindowsPhone, an additional implementation is available:
 
@@ -1005,7 +1001,7 @@ or:
      
 Finally, the `PictureChooser` plugin also provides an "InMemoryImage" ValueConverter - `MvxInMemoryImageValueConverter`. This value converter allows images to be decoded from byte arrays for use on-screen.
 
-The "InMemoryImage" ValueConverter can be seen in use in the PictureChooser sample - see TODO.
+The "InMemoryImage" ValueConverter can be seen in use in the PictureTaking sample - see https://github.com/slodge/MvvmCross-Tutorials/tree/master/PictureTaking.
 
 ### Reflection
 
@@ -1020,8 +1016,8 @@ Current advice (August 2013): there's no reason to use this plugin.
 
 The `ResourceLoader` plugin provides access to files bundled within the app package.
 
-- On Android, this is for files bundled in the `Assets` folder and marked as build action `AndroidAsset`
-- On iOS and Windows, this is for files bundled as `Content` (TODO - check this - make Build Action explicit here)
+- On Android, this is for files bundled in the `Assets` folder and marked as Build Action of `AndroidAsset`
+- On iOS and Windows, this is for files bundled with a Build Action of `Content` 
 
 On several platforms, the ResourceLoader plugin requires an `IMvxFileStore` is available. One easy way to supply this is to load the `File` plugin.
 
@@ -1041,8 +1037,8 @@ For a text file 'Hello.txt' bundled in a folder 'Foo', this can be called as:
 
 Samples using the ResourceLoader plugin include:
 
-- Babel - JsonLocalisation - see TODO
-- Conference - the sessions are loaded from Json resources - see TODO
+- Babel - JsonLocalisation - see https://github.com/slodge/MvvmCross-Tutorials/tree/master/Babel
+- Conference - the sessions are loaded from Json resources - see https://github.com/slodge/MvvmCross-Tutorials/tree/master/Sample%20-%20CirriousConference
 
 ### Share
 
@@ -1058,11 +1054,11 @@ This plugin is available on Android, iOS, and WindowsPhone. On WindowsStore, sha
 
 On Android, sharing is done using general Share/Send Intents. This could be improved in future implementations.
 On WindowsPhone, sharing is done via the OS level share task. 
-On iOS, currently only sharing by linked Twitter account is supported. There is code available to extend this to Facebook - see TODO.
+On iOS, currently only sharing by linked Twitter account is supported. There is code available to extend this to Facebook - see https://github.com/slodge/MvvmCross/issues/188.
 
 A sample using the Share plugin is:
 
-- Conference - the sessions are loaded from Json resources - see TODO
+- Conference - see https://github.com/slodge/MvvmCross-Tutorials/tree/master/Sample%20-%20CirriousConference
 
 ### SoundEffects
 
@@ -1094,7 +1090,7 @@ Current advice (August 2013): this plugin isn't really useful outside of Windows
 
 The `Sqlite` plugin provide local Sqlite storage via the a modified version of the Sqlite-net library.
 
-The original version of this library is at TODO-LINK.
+The version of this library MvvmCross forked from is at https://github.com/praeclarum/sqlite-net/.
 
 In SQLite-net, database entities are mapped into RAM using ORM classes like:
 
@@ -1144,12 +1140,12 @@ Once opened/created, SQLite database connections can be used like:
     // Select
     var item = connection.Table<CollectedItem>.FirstOrDefault(x => x.Id == 42);
 
-For more on the capabilities and use of sqlite-net, see TODO-Praeclarum.
+For more on the capabilities and use of sqlite-net, see https://github.com/praeclarum/sqlite-net/.
 
 For samples using sqlite-net, see:
 
-- N=10 - KittensDb - TODO-LINK
-- N=12 to N=17 - CollectABull - TODO-LINK
+- N=10 - KittensDb - http://slodge.blogspot.co.uk/2013/05/n10-sqlite-persistent-data-storage-n1.html
+- N=12 to N=17 - CollectABull - http://slodge.blogspot.co.uk/2013/05/n12-collect-bull-full-app-part-1-n1.html
  
 The file location used by the sqlite-net `factory.Create` call is not ideal:
 
@@ -1160,9 +1156,9 @@ The file location used by the sqlite-net `factory.Create` call is not ideal:
 
 This may need changing and unifying in future versions of the plugin. To avoid these default locations, providing absolute paths is possible on some platforms.
 
-Use of the Swlite plugin on WindowsStore (and to some extent Wpf) is complicated by Windows native x86, x64 and ARM Sqlite.dll versions. For some discussion on this, see TODO-LINKS 
+Use of the Sqlite plugin on WindowsStore (and to some extent Wpf) is complicated by Windows native x86, x64 and ARM Sqlite.dll versions. For some discussion on this, see https://github.com/slodge/MvvmCross/issues/307
 
-The future of this plugin is that we do want to reintegrate with the core Sqlite-net version - see TODO-Issue.
+The future of this plugin is that we do want to reintegrate with the core Sqlite-net version - see https://github.com/praeclarum/sqlite-net/issues/135.
 
 Until this reintegration occurs, we aren't actively extending this plugin - we don't want to diverge from the core platform if we can help it.
 
@@ -1182,7 +1178,7 @@ The `Visibility` plugin provides native implementations for the `MvxVisibility` 
 
 `Visibility` is available on all platforms.
 
-The `Visibility` functionality is generally not used directlt - instead it's generally used within ValueConverters used in Data-Binding. The plugin includes a couple of general purpose Value Converters - for more on these, see TODO-VC-Wiki-Document.
+The `Visibility` functionality is generally not used directlt - instead it's generally used within ValueConverters used in Data-Binding. The plugin includes a couple of general purpose Value Converters - for more on these, see [The Mvx Visibility ValueConverters](https://github.com/slodge/MvvmCross/wiki/Value-Converters#the-mvx-visibility-valueconverters).
 
 ### WebBrowser
 
@@ -1197,18 +1193,15 @@ This plugin is available on all of Android, iOS, WindowsPhone and WindowsStore.
 
 ## Other Plugins
 
-### OrangeBits
-TODO - One from Italy?
+### OrangeBit
+Bitmap Plugin - Android and WindowsStore - https://github.com/orangebit/mvvmcross-bitmap-plugin/
 
-### CheeseBaron
-TODO - One from CheeseBaron (tasks - although maybe this got pulled after async was released)
-
-### JamesM
-TODO - Settings from JamesM
+### James Montemagno 
+Settings - Android, iOS, WindowsPhone and WindowsStore - https://github.com/ceton/Mvx.Plugins.Settings
 
 ### GoodVibrations
 
-This sample project is in TODO
+This sample project is in https://github.com/slodge/MvvmCross-Tutorials/tree/master/GoodVibrations
 
 This includes a simple Vibration implementation on Android, iOS and WindowsPhone.
 
@@ -1218,4 +1211,4 @@ The BallControl sample provides several examples of Plugins.
 
 Most notably, BallControl includes a sample Bluetooth plugin for controlling Sphero Bluetooth robots.
 
-Unfortunately, the source code for BallControl has gotten a little 'uncared for' recently - the update to v3 hasn't really been fully completed. However, the v3 branch does at least illustrate a real app with real plugins - see TODO.
+Unfortunately, the source code for BallControl has gotten a little 'uncared for' recently - the update to v3 hasn't really been fully completed. However, the v3 branch does at least illustrate a real app with real plugins - see https://github.com/slodge/BallControl/tree/hotTuna.
